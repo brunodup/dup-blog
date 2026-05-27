@@ -1,0 +1,122 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* ── Switzer @font-face ──────────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/switzer/Switzer-Thin.otf') format('opentype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/switzer/Switzer-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/switzer/Switzer-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/switzer/Switzer-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/switzer/Switzer-Extrabold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Switzer';
+  src: url('/fonts/switzer/Switzer-Black.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Fonts ──────────────────────────────────────────────────────────────────── */
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-switzer: 'Switzer', system-ui, sans-serif;
+}
+
+/* ── Floor menu buttons ──────────────────────────────────────────────────────── */
+.floor-btn {
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.floor-btn:hover {
+  background: #000;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .board-title {
+    font-size: 55px !important;
+  }
+  .floor-menu {
+    transform: translateX(-50%) scale(0.85) !important;
+    transform-origin: bottom center;
+  }
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: #ffffff;
+  color: #111111;
+}
+
+body {
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+  background: #ffffff;
+  color: #111111;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Typography overrides (prose) ────────────────────────────────────────────
+   Keeps the prose defaults but uses our font stack and tighter line-heights. */
+.prose {
+  --tw-prose-body: #333333;
+  --tw-prose-headings: #111111;
+  --tw-prose-links: #111111;
+  --tw-prose-bold: #111111;
+  --tw-prose-counters: #888888;
+  --tw-prose-bullets: #888888;
+  --tw-prose-quotes: #111111;
+  --tw-prose-quote-borders: #111111;
+  --tw-prose-code: #111111;
+  --tw-prose-pre-bg: #f4f4f4;
+}
+
+/* ── Scrollbar (webkit) ──────────────────────────────────────────────────────
+   Minimal scrollbar for the detail page; hidden on the board (overflow:hidden). */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cccccc;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #999999;
+}
