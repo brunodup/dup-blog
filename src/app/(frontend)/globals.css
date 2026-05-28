@@ -94,14 +94,25 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Sem animação: logo aparece estático normalmente */
 .logo-dup,
-.logo-agency {
-  animation: logoDropBounce 800ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+.logo-agency,
+.logo-dot {
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
-.logo-dot {
-  opacity: 0;
-  animation: logoDropBounce 800ms cubic-bezier(0.34, 1.56, 0.64, 1) 400ms both;
+/* Animação só para quem não pediu reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  .logo-dup,
+  .logo-agency {
+    animation: logoDropBounce 800ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .logo-dot {
+    opacity: 0;
+    animation: logoDropBounce 800ms cubic-bezier(0.34, 1.56, 0.64, 1) 400ms both;
+  }
 }
 
 /* ── Base ───────────────────────────────────────────────────────────────────── */
