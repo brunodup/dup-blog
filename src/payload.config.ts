@@ -20,6 +20,18 @@ const dirname = path.dirname(filename)
 const supabaseUrl = process.env.SUPABASE_URL || ''
 const s3Bucket = process.env.S3_BUCKET || ''
 
+const serverURL = process.env.NEXT_PUBLIC_SERVER_URL ||
+  (process.env.VERCEL_BRANCH_URL ? `https://${process.env.VERCEL_BRANCH_URL}` : '') ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
+  'http://localhost:3000'
+
+const allowedOrigins = [
+  serverURL,
+  process.env.NEXT_PUBLIC_SERVER_URL,
+  process.env.VERCEL_BRANCH_URL ? `https://${process.env.VERCEL_BRANCH_URL}` : null,
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
+].filter((v): v is string => Boolean(v))
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -59,8 +71,10 @@ export default buildConfig({
   graphQL: {
     disablePlaygroundInProduction: true,
   },
+  cors: allowedOrigins,
+  csrf: allowedOrigins,
   secret: process.env.PAYLOAD_SECRET || '',
-  serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
+  serverURL,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
