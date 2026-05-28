@@ -19,7 +19,7 @@ export default function Logo({ className }: { className?: string }) {
 
       {/* . */}
       <g className="logo-dot">
-        <path d="M1292.8 165.663V119.685H1338.78V165.663H1292.8Z" />
+        <circle cx="1315.79" cy="142.674" r="23" />
       </g>
 
       {/* agency */}
