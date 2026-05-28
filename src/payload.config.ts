@@ -50,6 +50,7 @@ export default buildConfig({
     s3Storage({
       collections: {
         media: {
+          clientUploads: true,
           // Serve files directly from Supabase CDN instead of proxying via Payload.
           generateFileURL: ({ filename: fname }) =>
             `${supabaseUrl}/storage/v1/object/public/${s3Bucket}/${fname}`,
