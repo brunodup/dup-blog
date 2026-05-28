@@ -68,6 +68,8 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
+    schemaName: process.env.DATABASE_SCHEMA || 'public',
+    push: process.env.NODE_ENV === 'development',
   }),
   sharp,
 })
