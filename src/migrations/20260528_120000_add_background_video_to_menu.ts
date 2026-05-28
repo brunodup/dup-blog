@@ -1,6 +1,6 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
-export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+export async function up({ db }: MigrateUpArgs): Promise<void> {
   const s = (process.env.DATABASE_SCHEMA || 'public').replace(/[^\w]/g, '')
   await db.execute(sql.raw(`
    ALTER TABLE "${s}"."menu" ADD COLUMN IF NOT EXISTS "background_video_id" integer;
@@ -16,7 +16,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   `))
 }
 
-export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
+export async function down({ db }: MigrateDownArgs): Promise<void> {
   const s = (process.env.DATABASE_SCHEMA || 'public').replace(/[^\w]/g, '')
   await db.execute(sql.raw(`
    ALTER TABLE "${s}"."menu" DROP COLUMN IF EXISTS "background_video_id";

@@ -15,9 +15,6 @@ export const Media: CollectionConfig = {
       { name: 'card', width: 1024 },
     ],
     adminThumbnail: 'thumbnail',
-    limits: {
-      fileSize: 10485760, // 10MB
-    },
   },
   fields: [
     {
