@@ -1,4 +1,5 @@
-import { expand } from 'emmet'
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { expand } = require('emmet') as { expand: (abbr: string, options?: Record<string, unknown>) => string }
 
 export type JsMode = 'vanilla' | 'jsx' | 'threejs'
 

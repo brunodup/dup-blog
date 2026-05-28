@@ -71,6 +71,24 @@
   }
 }
 
+/* ── Top loader gradient ─────────────────────────────────────────────────────── */
+#nprogress .bar {
+  background: linear-gradient(to right, #7dd3fc, #1d4ed8) !important;
+}
+#nprogress .peg {
+  box-shadow: 0 0 10px #38bdf8, 0 0 5px #38bdf8 !important;
+}
+
+/* ── Animations ─────────────────────────────────────────────────────────────── */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up {
+  opacity: 0;
+  animation: slideUp 0.45s ease forwards;
+}
+
 /* ── Base ───────────────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;

@@ -8,7 +8,8 @@ import { javascript } from '@codemirror/lang-javascript'
 import { keymap } from '@codemirror/view'
 import { Prec } from '@codemirror/state'
 import type { Extension } from '@codemirror/state'
-import { expand } from 'emmet'
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { expand } = require('emmet') as { expand: (abbr: string, options?: Record<string, unknown>) => string }
 import { useField } from '@payloadcms/ui'
 import { buildSrcdoc, compileScss, processExpansion, type JsMode } from '@/lib/playground'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -203,6 +204,7 @@ export default function CodeSnippetPlayground() {
 
   useEffect(() => {
     const handler = (e: MessageEvent) => {
+      if (e.origin !== window.location.origin && e.origin !== 'null') return
       if (e.data?.type === 'pg-err') {
         setErrors((prev) => [
           ...prev,

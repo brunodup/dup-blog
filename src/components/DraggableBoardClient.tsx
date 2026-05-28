@@ -8,12 +8,15 @@ const DraggableBoard = dynamic(() => import('./DraggableBoard'), {
   loading: () => <div className="w-screen h-screen bg-white" />,
 })
 
+export type MenuItem = { label: string; href: string; target: string }
+
 interface Props {
   posts: Post[]
   videoSrc?: string
   videoPoster?: string
+  menuItems: MenuItem[]
 }
 
-export default function DraggableBoardClient({ posts, videoSrc, videoPoster }: Props) {
-  return <DraggableBoard posts={posts} videoSrc={videoSrc} videoPoster={videoPoster} />
+export default function DraggableBoardClient({ posts, videoSrc, videoPoster, menuItems }: Props) {
+  return <DraggableBoard posts={posts} videoSrc={videoSrc} videoPoster={videoPoster} menuItems={menuItems} />
 }

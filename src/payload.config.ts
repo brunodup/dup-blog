@@ -11,6 +11,8 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Posts } from './collections/Posts'
 import { Categories } from './collections/Categories'
+import { Pages } from './collections/Pages'
+import { Menu } from './globals/Menu'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -29,7 +31,8 @@ export default buildConfig({
       titleSuffix: ' · brunodup',
     },
   },
-  collections: [Posts, Media, Users, Categories],
+  collections: [Posts, Media, Users, Categories, Pages],
+  globals: [Menu],
   editor: lexicalEditor(),
   plugins: [
     s3Storage({
@@ -53,6 +56,9 @@ export default buildConfig({
       },
     }),
   ],
+  graphQL: {
+    disablePlaygroundInProduction: true,
+  },
   secret: process.env.PAYLOAD_SECRET || '',
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
   typescript: {

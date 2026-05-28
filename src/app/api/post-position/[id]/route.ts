@@ -34,11 +34,15 @@ export async function PATCH(
   try {
     const payload = await getPayload({ config })
 
+    const { user } = await payload.auth({ headers: req.headers })
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     await payload.update({
       collection: 'posts',
       id: numId,
       data: { position_x: x, position_y: y },
-      overrideAccess: true,
       depth: 0,
     })
 

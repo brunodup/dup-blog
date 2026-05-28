@@ -4,8 +4,10 @@ import type { Media, Post } from '@/payload-types'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useTopLoader } from 'nextjs-toploader'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import LogoLink from '@/components/LogoLink'
+import type { MenuItem } from '@/components/DraggableBoardClient'
 
 // ── Safety zones ──────────────────────────────────────────────────────────
 // Each zone is a rect in % units (relative to 100vw / 100vh).
@@ -229,6 +231,7 @@ interface Props {
   posts: Post[]
   videoSrc?: string
   videoPoster?: string
+  menuItems: MenuItem[]
 }
 
 // 'hidden'  → off-screen, no transition (initial state)
@@ -236,8 +239,9 @@ interface Props {
 // 'visible' → in position, transition fires
 type EntryState = 'hidden' | 'ready' | 'visible'
 
-export default function DraggableBoard({ posts, videoSrc, videoPoster }: Props) {
+export default function DraggableBoard({ posts, videoSrc, videoPoster, menuItems }: Props) {
   const router = useRouter()
+  const topLoader = useTopLoader()
 
   const [entryState, setEntryState] = useState<EntryState>('hidden')
   const [exitPhase, setExitPhase] = useState<0 | 1>(0)
@@ -283,9 +287,10 @@ export default function DraggableBoard({ posts, videoSrc, videoPoster }: Props) 
   // Quando o vídeo terminar, navega pro link que o usuário clicou.
   const handleVideoEnded = useCallback(() => {
     if (pendingPathRef.current) {
+      topLoader.start()
       router.push(pendingPathRef.current)
     }
-  }, [router])
+  }, [router, topLoader])
 
   // Intercepta cliques em links do board: segura a navegação, dá play no
   // vídeo até o final e navega quando ele terminar.
@@ -297,9 +302,10 @@ export default function DraggableBoard({ posts, videoSrc, videoPoster }: Props) 
       if (didDragRef.current) return
       const anchor = (e.target as Element).closest('a')
       if (!anchor) return
+      const url = new URL((anchor as HTMLAnchorElement).href)
+      if (url.hostname !== window.location.hostname) return  // externo → browser trata
       e.preventDefault()
       e.stopPropagation()
-      const url = new URL((anchor as HTMLAnchorElement).href)
       pendingPathRef.current = url.pathname + url.search + url.hash
       playingToEndRef.current = true
       bgVideoRef.current?.play()
@@ -507,14 +513,16 @@ export default function DraggableBoard({ posts, videoSrc, videoPoster }: Props) 
             transformOrigin: 'bottom center',
           }}
         >
-          {['Home', 'Sobre', 'Nômade', 'Dup.Agency', 'Dup.Labs', 'Contato'].map((label) => (
-            <button
+          {menuItems.map(({ label, href, target }) => (
+            <Link
               key={label}
+              href={href}
+              target={target}
               className="floor-btn font-switzer font-bold text-black bg-transparent uppercase"
-              style={{ border: '4px solid black', padding: '14px 32px', fontSize: '1.05rem', cursor: 'pointer', whiteSpace: 'nowrap' }}
+              style={{ border: '4px solid black', padding: '14px 32px', fontSize: '1.05rem', whiteSpace: 'nowrap', display: 'block', textAlign: 'center' }}
             >
               {label}
-            </button>
+            </Link>
           ))}
         </nav>
       </div>

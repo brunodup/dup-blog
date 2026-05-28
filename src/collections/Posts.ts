@@ -62,6 +62,9 @@ export const Posts: CollectionConfig = {
   slug: 'posts',
   access: {
     read: () => true,
+    create: ({ req }) => Boolean(req.user),
+    update: ({ req }) => Boolean(req.user),
+    delete: ({ req }) => Boolean(req.user),
   },
   admin: {
     useAsTitle: 'title',

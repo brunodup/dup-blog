@@ -33,6 +33,7 @@
     "emmet": "^2.4.11",
     "graphql": "^16.14.0",
     "next": "15.4.11",
+    "nextjs-toploader": "^3.9.17",
     "payload": "^3.84.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",

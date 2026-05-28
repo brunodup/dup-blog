@@ -7,6 +7,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import type { Media, Post } from '@/payload-types'
 import CodePlayground from '@/components/CodePlayground'
+import ImageWithModal from '@/components/ImageWithModal'
 import LogoLink from '@/components/LogoLink'
 import type { JsMode } from '@/lib/playground'
 
@@ -86,13 +87,11 @@ function ImagePost({ post }: { post: Post }) {
     <>
       {src && (
         <figure className="mb-8 rounded-md overflow-hidden bg-gray-100 -mx-6 sm:mx-0">
-          <Image
+          <ImageWithModal
             src={src}
             alt={media?.alt || post.title || ''}
             width={w}
             height={h}
-            className="w-full h-auto block"
-            priority
           />
         </figure>
       )}
