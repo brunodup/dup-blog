@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "payload migrate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "payload": "payload",
