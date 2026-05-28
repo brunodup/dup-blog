@@ -9,6 +9,18 @@ export const Menu: GlobalConfig = {
   },
   fields: [
     {
+      name: 'backgroundVideo',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Vídeo de fundo',
+    },
+    {
+      name: 'backgroundVideoPoster',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Poster do vídeo',
+    },
+    {
       name: 'items',
       type: 'array',
       label: 'Itens',
