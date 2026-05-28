@@ -18,17 +18,15 @@ export default async function HomePage() {
       overrideAccess: true,
     }),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (payload as any).findGlobal({ slug: 'menu', depth: 1, overrideAccess: true }),
+    (payload as any).findGlobal({ slug: 'menu', depth: 0, overrideAccess: true }),
   ])
 
   const menuItems: MenuItem[] = ((menuGlobal as any)?.items ?? []).map( // eslint-disable-line @typescript-eslint/no-explicit-any
     (item: any) => ({ label: item.label ?? '', href: item.href ?? '/', target: item.target ?? '_self' }) // eslint-disable-line @typescript-eslint/no-explicit-any
   )
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const videoSrc: string | undefined = (menuGlobal as any)?.backgroundVideo?.url || undefined
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const videoPoster: string | undefined = (menuGlobal as any)?.backgroundVideoPoster?.url || undefined
+  const videoSrc = process.env.BACKGROUND_VIDEO_URL || undefined
+  const videoPoster = process.env.BACKGROUND_VIDEO_POSTER_URL || undefined
 
   return (
     <main className="w-screen h-screen overflow-hidden">
