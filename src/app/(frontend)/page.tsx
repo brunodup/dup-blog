@@ -26,7 +26,7 @@ export default async function HomePage() {
   )
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const videoSrc = (menuGlobal as any)?.backgroundVideo?.url || process.env.BACKGROUND_VIDEO_URL || undefined
+  const videoSrc = (menuGlobal as any)?.backgroundVideo?.url || process.env.BACKGROUND_VIDEO_URL || '/video-dup.mp4'
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const videoPoster = (menuGlobal as any)?.backgroundVideoPoster?.url || process.env.BACKGROUND_VIDEO_POSTER_URL || undefined
 

@@ -48,7 +48,6 @@ export default buildConfig({
   editor: lexicalEditor(),
   plugins: [
     s3Storage({
-      clientUploads: true,
       collections: {
         media: {
           // Serve files directly from Supabase CDN instead of proxying via Payload.
