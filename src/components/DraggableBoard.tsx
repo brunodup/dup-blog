@@ -284,21 +284,13 @@ export default function DraggableBoard({ posts, videoSrc, videoPoster, menuItems
     }
   }, [triggerEntry])
 
-  // Navega pro link pendente — chamado pelo onEnded ou pelo fallback de erro.
-  const navigatePending = useCallback(() => {
+  // Quando o vídeo terminar, navega pro link que o usuário clicou.
+  const handleVideoEnded = useCallback(() => {
     if (pendingPathRef.current) {
       topLoader.start()
       router.push(pendingPathRef.current)
     }
   }, [router, topLoader])
-
-  const handleVideoEnded = navigatePending
-
-  // Se o vídeo falhar durante o play-to-end, navega mesmo assim.
-  const handleVideoError = useCallback(() => {
-    triggerEntry()
-    navigatePending()
-  }, [triggerEntry, navigatePending])
 
   // Intercepta cliques em links do board: segura a navegação, dá play no
   // vídeo até o final e navega quando ele terminar.
@@ -324,15 +316,11 @@ export default function DraggableBoard({ posts, videoSrc, videoPoster, menuItems
   }, [])
 
   // Se não tiver vídeo, dispara a entrada depois de um delay curto.
-  // Também serve de fallback se o vídeo falhar antes de chegar em 4s.
   useEffect(() => {
     if (!videoSrc) {
       const t = setTimeout(triggerEntry, 400)
       return () => clearTimeout(t)
     }
-    // Fallback: se o vídeo não disparar triggerEntry em 6s, faz isso.
-    const t = setTimeout(triggerEntry, 6000)
-    return () => clearTimeout(t)
   }, [videoSrc, triggerEntry])
 
   const handleDragStart = useCallback(
@@ -444,7 +432,6 @@ export default function DraggableBoard({ posts, videoSrc, videoPoster, menuItems
         poster={videoPoster}
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleVideoEnded}
-        onError={handleVideoError}
       >
         {videoSrc && <source src={videoSrc} />}
       </video>
