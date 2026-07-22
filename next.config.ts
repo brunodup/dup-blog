@@ -3,6 +3,9 @@ import type { NextConfig } from 'next'
 import { withPayload } from '@payloadcms/next/withPayload'
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [{ source: '/run-forest-run', destination: '/run-forest-run.html' }]
+  },
   async headers() {
     return [
       {

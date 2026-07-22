@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Corrida">
+<meta name="theme-color" content="#0A0A0B">
+<title>Corrida — 0 aos 15km</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0A0A0B;
+  --console:#141418;
+  --console-2:#1D1D23;
+  --line:#2A2A32;
+  --run:#FF6B1A;
+  --walk:#3BA3C7;
+  --signal:#EDE9E1;
+  --dim:#75757F;
+  --pad: clamp(16px, 5vw, 28px);
+  --mono:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --cond:"IBM Plex Sans Condensed", "Helvetica Neue", system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:var(--ink); color:var(--signal);
+  font-family:var(--cond);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+  transition:background 480ms ease;
+}
+body.flood-run{background:radial-gradient(120% 90% at 50% 38%, #4A1C05 0%, #170C05 55%, var(--ink) 100%)}
+body.flood-walk{background:radial-gradient(120% 90% at 50% 38%, #0A3040 0%, #061820 55%, var(--ink) 100%)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+#app{height:100%;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:var(--pad) var(--pad) 24px}
+.view{display:none}.view.on{display:block}
+
+/* ---------- type ---------- */
+.eyebrow{
+  font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--dim);
+}
+h2.title{font-family:var(--cond);font-weight:700;font-size:26px;letter-spacing:-.01em;line-height:1.1;margin-top:6px}
+.sub{color:var(--dim);font-size:14px;line-height:1.5;margin-top:8px}
+
+/* ---------- session strip ---------- */
+.strip{display:flex;gap:2px;height:5px;margin:22px 0 8px;border-radius:99px;overflow:hidden;background:var(--console)}
+.strip i{display:block;height:100%;background:var(--line);transition:background 200ms}
+.strip i.run{background:rgba(255,107,26,.28)}
+.strip i.walk{background:rgba(59,163,199,.28)}
+.strip i.past.run,.strip i.now.run{background:var(--run)}
+.strip i.past.walk,.strip i.now.walk{background:var(--walk)}
+.strip i.now{animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.45}}
+
+/* ---------- timer ---------- */
+.stage{text-align:center;padding:14px 0 4px}
+.state-word{
+  font-family:var(--cond);font-weight:700;font-size:clamp(38px,13vw,60px);
+  letter-spacing:.06em;text-transform:uppercase;line-height:1;
+}
+.state-word.run{color:var(--run)}
+.state-word.walk{color:var(--walk)}
+.state-word.idle{color:var(--signal)}
+.clock{
+  font-family:var(--mono);font-weight:600;
+  font-size:clamp(76px,26vw,132px);line-height:.95;letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums;margin-top:2px;
+}
+.next{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:14px}
+.next b{color:var(--signal);font-weight:600}
+
+/* ---------- buttons ---------- */
+.row{display:flex;gap:10px;margin-top:22px}
+button{font-family:var(--cond);font-size:16px;font-weight:600;cursor:pointer;border:0}
+.btn{
+  flex:1;padding:17px 14px;border-radius:14px;background:var(--signal);color:var(--ink);
+  letter-spacing:.02em;transition:transform 120ms,opacity 120ms;
+}
+.btn:active{transform:scale(.975)}
+.btn.ghost{background:transparent;color:var(--signal);border:1px solid var(--line)}
+.btn.warm{background:var(--run);color:#170800}
+.btn:disabled{opacity:.35}
+.btn.sm{padding:12px;font-size:14px;flex:0 0 auto;min-width:96px}
+
+/* ---------- cards ---------- */
+.card{background:var(--console);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:12px}
+.card.rest{border-style:dashed;background:transparent}
+.spec{font-family:var(--mono);font-size:13px;color:var(--dim);line-height:1.8;margin-top:12px}
+.spec b{color:var(--signal);font-weight:600}
+
+/* ---------- week list ---------- */
+.day{
+  display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid var(--line);
+  border-radius:14px;margin-top:8px;background:var(--console);
+}
+.day.today{border-color:var(--run)}
+.day.rest{background:transparent;border-style:dashed;opacity:.6}
+.day .tag{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--dim);width:34px;flex:0 0 34px}
+.day.today .tag{color:var(--run)}
+.day .body{flex:1;min-width:0}
+.day .body .n{font-size:15px;font-weight:600}
+.day .body .d{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:3px;letter-spacing:.04em}
+.tick{
+  width:30px;height:30px;flex:0 0 30px;border-radius:50%;border:1.5px solid var(--line);
+  background:transparent;display:grid;place-items:center;color:transparent;font-size:15px;font-weight:700;
+}
+.tick.on{background:var(--run);border-color:var(--run);color:#170800}
+
+textarea{
+  width:100%;margin-top:12px;background:var(--console-2);border:1px solid var(--line);color:var(--signal);
+  border-radius:12px;padding:12px;font-family:var(--cond);font-size:15px;resize:vertical;min-height:74px;
+}
+textarea:focus{outline:none;border-color:var(--walk)}
+
+/* ---------- plan table ---------- */
+.wk{
+  display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--line);
+}
+.wk:last-child{border-bottom:0}
+.wk.cur{background:var(--console);border-radius:12px;border-bottom-color:transparent}
+.wk .num{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--dim);width:34px;flex:0 0 34px}
+.wk.cur .num{color:var(--run)}
+.wk .lab{flex:1;font-size:14px;min-width:0}
+.wk .lab small{display:block;font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:2px}
+.phase-h{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.2em;color:var(--dim);
+  text-transform:uppercase;margin:26px 0 6px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+
+/* ---------- tabs ---------- */
+nav{
+  display:flex;border-top:1px solid var(--line);background:rgba(10,10,11,.86);
+  backdrop-filter:blur(20px);padding-bottom:env(safe-area-inset-bottom);
+}
+nav button{
+  flex:1;background:none;padding:14px 4px 15px;color:var(--dim);
+  font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+}
+nav button.on{color:var(--run)}
+body.session nav{display:none}
+
+.note-store{font-family:var(--mono);font-size:10.5px;color:var(--dim);line-height:1.7;
+  letter-spacing:.04em;margin-top:26px;padding-top:14px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div id="app">
+  <main>
+    <!-- HOJE -->
+    <section class="view on" id="v-hoje"></section>
+    <!-- SEMANA -->
+    <section class="view" id="v-semana"></section>
+    <!-- PLANO -->
+    <section class="view" id="v-plano"></section>
+  </main>
+  <nav>
+    <button class="on" data-v="hoje">Hoje</button>
+    <button data-v="semana">Semana</button>
+    <button data-v="plano">Plano</button>
+  </nav>
+</div>
+
+<script>
+/* ============ armazenamento ============ */
+const store=(()=>{let mem={},ok=false;
+  try{localStorage.setItem('__p','1');localStorage.removeItem('__p');ok=true}catch(e){ok=false}
+  return{ok,
+    get(k,d){try{const v=ok?localStorage.getItem(k):mem[k];return v?JSON.parse(v):d}catch(e){return d}},
+    set(k,v){const s=JSON.stringify(v);try{ok?localStorage.setItem(k,s):mem[k]=s}catch(e){mem[k]=s}}};
+})();
+const KEY='dup.corrida.v1';
+let S=store.get(KEY,{week:1,log:{}});
+const save=()=>store.set(KEY,S);
+
+/* ============ plano ============ */
+const P1=[ /* semanas 1-8: intervalado */
+ {reps:8,run:60, walk:120},
+ {reps:7,run:120,walk:120},
+ {reps:6,run:180,walk:120},
+ {reps:5,run:240,walk:120},
+ {reps:4,run:360,walk:120},
+ {reps:3,run:540,walk:120},
+ {reps:2,run:840,walk:180},
+ {cont:1800}
+];
+const LONGS={13:6,14:7,15:8,16:6,17:9,18:10,19:11,20:8,21:12,22:13,23:14,24:11,25:15,26:15};
+const DELOAD=[16,20,24];
+const DAYS=[
+ {i:0,s:'DOM',t:'walk'},{i:1,s:'SEG',t:'run'},{i:2,s:'TER',t:'rest'},
+ {i:3,s:'QUA',t:'run'},{i:4,s:'QUI',t:'rest'},{i:5,s:'SEX',t:'walk'},
+ {i:6,s:'SÁB',t:'run',long:true}
+];
+const ORDER=[1,2,3,4,5,6,0];
+const WARM=300, COOL=300, WALKDAY=1320;
+
+function phase(w){return w<=8?1:w<=12?2:3}
+
+function weekLabel(w){
+  if(w<=8){const b=P1[w-1];
+    return b.cont?'30 min contínuos':`${b.reps}× (${fmtm(b.run)} / ${fmtm(b.walk)})`;}
+  if(w<=12)return '5 km contínuos';
+  return `Longa de ${LONGS[w]} km`+(DELOAD.includes(w)?' · deload':'');
+}
+function fmtm(s){return s%60===0?`${s/60}′`:`${Math.floor(s/60)}′${s%60}″`}
+
+/* monta a sessão do dia -> lista de segmentos */
+function session(w,d){
+  const day=DAYS[d];
+  if(day.t==='rest')return null;
+  if(day.t==='walk')return{kind:'walk',name:'Caminhada inclinada',
+    hint:'Inclinação 6–8%, ritmo confortável. Sem corrida hoje.',
+    segs:[{t:'walk',dur:WALKDAY,label:'Caminhada'}]};
+
+  const ph=phase(w);
+  const segs=[{t:'walk',dur:WARM,label:'Aquecimento'}];
+  let name,hint;
+
+  if(ph===1){
+    const b=P1[w-1];
+    if(b.cont){name='30 min contínuos';hint='Ritmo de conversa do começo ao fim. Se apertar, reduz a velocidade.';
+      segs.push({t:'run',dur:b.cont,label:'Corrida'});}
+    else{name=`${b.reps}× (${fmtm(b.run)} / ${fmtm(b.walk)})`;
+      hint='Ritmo de conversa nos blocos de corrida. Caminhada é recuperação, não pausa.';
+      for(let i=0;i<b.reps;i++){
+        segs.push({t:'run',dur:b.run,label:`Corrida ${i+1}/${b.reps}`});
+        segs.push({t:'walk',dur:b.walk,label:`Caminhada ${i+1}/${b.reps}`});
+      }
+      segs.pop();
+    }
+  } else if(ph===2){
+    name='5 km contínuos';hint='Sem cronômetro de ritmo. O objetivo é o corpo aceitar 5 km como rotina.';
+    segs.push({t:'run',dur:'open',label:'5 km',km:5});
+  } else {
+    const km=day.long?LONGS[w]:5;
+    name=day.long?`Longa · ${km} km`:'5 km';
+    hint=day.long?'A longa da semana. Devagar. Se precisar caminhar um pouco, caminha.'
+                 :'Curta de manutenção. Ritmo de conversa.';
+    segs.push({t:'run',dur:'open',label:`${km} km`,km});
+  }
+  segs.push({t:'walk',dur:COOL,label:'Volta à calma'});
+  return{kind:'run',name,hint,segs};
+}
+
+/* ============ som + tela ============ */
+let AC=null,wake=null;
+function beep(hz,dur=160,vol=.28){
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==='suspended')AC.resume();
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.type='square';o.frequency.value=hz;o.connect(g);g.connect(AC.destination);
+    g.gain.setValueAtTime(0,AC.currentTime);
+    g.gain.linearRampToValueAtTime(vol,AC.currentTime+.012);
+    g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+dur/1000);
+    o.start();o.stop(AC.currentTime+dur/1000+.02);
+  }catch(e){}
+}
+const cue=t=>{ if(t==='run'){beep(1046,150);setTimeout(()=>beep(1318,190),165);} else {beep(523,240);} };
+const cueEnd=()=>{[0,220,440].forEach((d,i)=>setTimeout(()=>beep(784+i*160,260),d))};
+async function keepAwake(on){
+  try{ if(on&&'wakeLock'in navigator){wake=await navigator.wakeLock.request('screen');}
+       else if(wake){wake.release();wake=null;} }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&T.on)keepAwake(true) });
+
+/* ============ motor do timer ============ */
+let T={on:false,paused:true,segs:[],i:0,rem:0,up:0,tick:null,day:null,sess:null};
+
+function openSession(d){
+  const s=session(S.week,d);if(!s)return;
+  T={on:true,paused:true,segs:s.segs,i:0,rem:typeof s.segs[0].dur==='number'?s.segs[0].dur:0,
+     up:0,tick:null,day:d,sess:s};
+  document.body.classList.add('session');
+  render();
+}
+function closeSession(){
+  clearInterval(T.tick);T.on=false;T.paused=true;
+  document.body.classList.remove('session','flood-run','flood-walk');
+  keepAwake(false);render();
+}
+function play(){
+  if(!AC)beep(0,1,0); // destrava o áudio no primeiro toque
+  T.paused=false;keepAwake(true);
+  clearInterval(T.tick);T.tick=setInterval(step,250);
+  cue(T.segs[T.i].t);render();
+}
+function pause(){T.paused=true;clearInterval(T.tick);keepAwake(false);render()}
+function step(){
+  const seg=T.segs[T.i];
+  if(seg.dur==='open'){T.up+=.25;paint();return}
+  T.rem-=.25;
+  if(T.rem<=0)advance();
+  paint();
+}
+function advance(){
+  if(T.i>=T.segs.length-1){ finish(); return; }
+  T.i++;T.up=0;
+  const n=T.segs[T.i];
+  T.rem=typeof n.dur==='number'?n.dur:0;
+  cue(n.t);render();
+}
+function finish(){
+  clearInterval(T.tick);cueEnd();
+  mark(S.week,T.day,true);
+  closeSession();go('semana');
+}
+
+/* ============ marcar ============ */
+const lk=(w,d)=>`${w}-${d}`;
+function mark(w,d,v){
+  const k=lk(w,d),e=S.log[k]||{};
+  e.done=v;e.ts=Date.now();S.log[k]=e;save();
+}
+function noteSet(w,d,txt){const k=lk(w,d);S.log[k]=S.log[k]||{};S.log[k].note=txt;save()}
+
+/* ============ views ============ */
+const $=s=>document.querySelector(s);
+let VIEW='hoje';
+function go(v){VIEW=v;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));render()}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+
+const clock=s=>{const m=Math.floor(Math.max(0,s)/60),x=Math.floor(Math.max(0,s)%60);
+  return `${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`};
+
+function paint(){ // atualiza só os números, sem redesenhar
+  const el=$('#clockNum');if(!el)return;
+  const seg=T.segs[T.i];
+  el.textContent=seg.dur==='open'?clock(T.up):clock(T.rem);
+}
+
+function render(){
+  if(T.on){renderSession();return}
+  $('#v-hoje').classList.toggle('on',VIEW==='hoje');
+  $('#v-semana').classList.toggle('on',VIEW==='semana');
+  $('#v-plano').classList.toggle('on',VIEW==='plano');
+  if(VIEW==='hoje')renderHoje();
+  if(VIEW==='semana')renderSemana();
+  if(VIEW==='plano')renderPlano();
+}
+
+function renderSession(){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  $('#v-hoje').classList.add('on');
+  const seg=T.segs[T.i],w=seg.t;
+  document.body.classList.toggle('flood-run',w==='run'&&!T.paused);
+  document.body.classList.toggle('flood-walk',w==='walk'&&!T.paused);
+  const nxt=T.segs[T.i+1];
+  const total=T.segs.reduce((a,s)=>a+(typeof s.dur==='number'?s.dur:600),0);
+
+  $('#v-hoje').innerHTML=`
+    <div class="eyebrow">Semana ${S.week} · ${DAYS[T.day].s} · ${T.sess.name}</div>
+    <div class="strip">${T.segs.map((s,i)=>{
+      const fr=(typeof s.dur==='number'?s.dur:600)/total*100;
+      return `<i class="${s.t} ${i<T.i?'past':''} ${i===T.i&&!T.paused?'now':''}" style="flex:0 0 ${fr}%"></i>`}).join('')}</div>
+    <div class="stage">
+      <div class="state-word ${T.paused?'idle':w}">${T.paused?'Pausado':(w==='run'?'Corre':'Caminha')}</div>
+      <div class="clock" id="clockNum">${seg.dur==='open'?clock(T.up):clock(T.rem)}</div>
+      <div class="next">${seg.label}${nxt?` · depois <b>${nxt.label}</b>`:' · último bloco'}</div>
+    </div>
+    <div class="row">
+      <button class="btn ${T.paused?'warm':'ghost'}" id="bPlay">${T.paused?'Iniciar':'Pausar'}</button>
+      <button class="btn ghost sm" id="bSkip">Pular</button>
+    </div>
+    <div class="row"><button class="btn ghost" id="bQuit">Encerrar sessão</button></div>
+    <div class="note-store">${seg.dur==='open'
+      ? 'Bloco livre: o relógio conta pra cima. Toca em Pular quando bater a distância.'
+      : 'O som avisa cada troca. Deixa o volume ligado.'}</div>`;
+
+  $('#bPlay').onclick=()=>T.paused?play():pause();
+  $('#bSkip').onclick=()=>{advance()};
+  $('#bQuit').onclick=()=>{ if(confirm('Encerrar sem concluir?'))closeSession() };
+}
+
+function renderHoje(){
+  const d=new Date().getDay(),day=DAYS[d],s=session(S.week,d),done=(S.log[lk(S.week,d)]||{}).done;
+  const ph=phase(S.week);
+  let html=`<div class="eyebrow">Semana ${S.week} de 26 · Fase ${ph} · ${day.s}</div>`;
+
+  if(!s){
+    html+=`<h2 class="title">Hoje é descanso.</h2>
+    <div class="card rest"><div class="sub">Terça e quinta ficam livres de propósito — é aí que tendão e panturrilha adaptam ao impacto novo. Volta amanhã.</div></div>`;
+  }else{
+    html+=`<h2 class="title">${s.name}</h2><div class="sub">${s.hint}</div>
+    <div class="card">
+      <div class="eyebrow">Como fica a sessão</div>
+      <div class="spec">
+        ${s.kind==='walk'
+          ? `<b>22 min</b> de caminhada<br>Inclinação <b>6–8%</b><br>Sem impacto hoje`
+          : `Aquecimento caminhando <b>5 min</b><br>${blockLine(s)}<br>Volta à calma caminhando <b>5 min</b><br>Inclinação da esteira em <b>1%</b>`}
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn warm" id="bGo">${done?'Fazer de novo':'Começar'}</button>
+      ${done?'':'<button class="btn ghost sm" id="bDone">Já fiz</button>'}
+    </div>
+    ${done?'<div class="note-store">Sessão de hoje marcada como concluída.</div>':''}`;
+  }
+  html+=storeNote();
+  $('#v-hoje').innerHTML=html;
+  const g=$('#bGo');if(g)g.onclick=()=>openSession(d);
+  const bd=$('#bDone');if(bd)bd.onclick=()=>{mark(S.week,d,true);render()};
+}
+function blockLine(s){
+  const runs=s.segs.filter(x=>x.t==='run');
+  if(runs.length===1&&runs[0].dur==='open')return `Corrida contínua de <b>${runs[0].km} km</b>`;
+  if(runs.length===1)return `Corrida contínua de <b>${Math.round(runs[0].dur/60)} min</b>`;
+  const b=P1[S.week-1];
+  return `<b>${b.reps}×</b> (corre ${fmtm(b.run)} · caminha ${fmtm(b.walk)})`;
+}
+
+function renderSemana(){
+  const today=new Date().getDay();
+  let done=0,tot=0;
+  const rows=ORDER.map(i=>{
+    const day=DAYS[i],s=session(S.week,i),e=S.log[lk(S.week,i)]||{};
+    if(s){tot++;if(e.done)done++}
+    if(!s)return `<div class="day rest"><div class="tag">${day.s}</div>
+      <div class="body"><div class="n">Descanso</div><div class="d">Sem esteira</div></div></div>`;
+    return `<div class="day ${i===today?'today':''}">
+      <div class="tag">${day.s}</div>
+      <div class="body"><div class="n">${s.name}</div>
+      <div class="d">${s.kind==='walk'?'CAMINHADA · 22 MIN':'ESTEIRA · INCLINAÇÃO 1%'}</div></div>
+      <button class="tick ${e.done?'on':''}" data-d="${i}">✓</button></div>`;
+  }).join('');
+
+  const note=(S.log[lk(S.week,'w')]||{}).note||'';
+  $('#v-semana').innerHTML=`
+    <div class="eyebrow">Semana ${S.week} · ${done} de ${tot} feitas</div>
+    <h2 class="title">${weekLabel(S.week)}</h2>
+    ${rows}
+    <div class="card">
+      <div class="eyebrow">Como foi a semana</div>
+      <textarea id="wnote" placeholder="Ritmo, sensação, dor, o que mudar…">${note}</textarea>
+    </div>
+    <div class="row">
+      <button class="btn ghost" id="bPrev">← Voltar</button>
+      <button class="btn" id="bNext">Avançar semana →</button>
+    </div>
+    <div class="note-store">Se a semana pesou, avança só quando ela ficar confortável. Repetir uma semana custa 7 dias; uma lesão custa 8.</div>
+    ${storeNote()}`;
+
+  document.querySelectorAll('.tick').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.d,e=S.log[lk(S.week,i)]||{};mark(S.week,i,!e.done);render()});
+  $('#wnote').oninput=e=>noteSet(S.week,'w',e.target.value);
+  $('#bPrev').onclick=()=>{if(S.week>1){S.week--;save();render()}};
+  $('#bNext').onclick=()=>{if(S.week<26){S.week++;save();render()}};
+}
+
+function renderPlano(){
+  let html=`<div class="eyebrow">Plano completo</div><h2 class="title">Do zero aos 15 km</h2>
+  <div class="sub">26 semanas. Toca numa semana pra ir pra ela.</div>`;
+  const groups=[
+    ['Fase 1 · base — 5 km',1,8],
+    ['Fase 2 · consolidar',9,12],
+    ['Fase 3 · rumo aos 15 km',13,26]
+  ];
+  groups.forEach(([t,a,b])=>{
+    html+=`<div class="phase-h">${t}</div>`;
+    for(let w=a;w<=b;w++){
+      let d=0,tt=0;
+      ORDER.forEach(i=>{if(session(w,i)){tt++;if((S.log[lk(w,i)]||{}).done)d++}});
+      html+=`<div class="wk ${w===S.week?'cur':''}" data-w="${w}">
+        <div class="num">${String(w).padStart(2,'0')}</div>
+        <div class="lab">${weekLabel(w)}<small>${d}/${tt} sessões</small></div>
+        <button class="tick ${d===tt&&tt?'on':''}">✓</button></div>`;
+    }
+  });
+  html+=storeNote();
+  $('#v-plano').innerHTML=html;
+  document.querySelectorAll('.wk').forEach(r=>r.onclick=()=>{S.week=+r.dataset.w;save();go('semana')});
+}
+
+function storeNote(){
+  return store.ok?'':`<div class="note-store">Este navegador está bloqueando o armazenamento local, então o progresso vale só enquanto a aba estiver aberta. Hospedando o arquivo num domínio seu, a marcação passa a ficar salva de verdade.</div>`;
+}
+
+render();
+</script>
+</body>
+</html>
