@@ -263,6 +263,7 @@ export default function DraggableBoard({ posts, videoSrc, videoPoster, menuItems
   const entryFiredRef = useRef(false)
   const playingToEndRef = useRef(false)
   const pendingPathRef = useRef<string | null>(null)
+  const navigatedRef = useRef(false)
 
   const triggerEntry = useCallback(() => {
     if (entryFiredRef.current) return
@@ -285,12 +286,17 @@ export default function DraggableBoard({ posts, videoSrc, videoPoster, menuItems
   }, [triggerEntry])
 
   // Quando o vídeo terminar, navega pro link que o usuário clicou.
-  const handleVideoEnded = useCallback(() => {
-    if (pendingPathRef.current) {
-      topLoader.start()
-      router.push(pendingPathRef.current)
-    }
+  // Navegação idempotente: dispara uma vez só, venha do onEnded do vídeo ou do fallback.
+  const doNavigate = useCallback(() => {
+    if (navigatedRef.current || !pendingPathRef.current) return
+    navigatedRef.current = true
+    topLoader.start()
+    router.push(pendingPathRef.current)
   }, [router, topLoader])
+
+  const handleVideoEnded = useCallback(() => {
+    doNavigate()
+  }, [doNavigate])
 
   // Intercepta cliques em links do board: segura a navegação, dá play no
   // vídeo até o final e navega quando ele terminar.
@@ -308,12 +314,21 @@ export default function DraggableBoard({ posts, videoSrc, videoPoster, menuItems
       e.stopPropagation()
       pendingPathRef.current = url.pathname + url.search + url.hash
       playingToEndRef.current = true
-      bgVideoRef.current?.play()
       setExitPhase(1)
+      // Toca a saída ("levanta e sai") e navega no onEnded. Se o vídeo não puder
+      // tocar, travar, ou não existir, navega mesmo assim — o post nunca fica preso.
+      const video = bgVideoRef.current
+      if (!video) {
+        doNavigate()
+        return
+      }
+      const played = video.play()
+      if (played && typeof played.catch === 'function') played.catch(() => doNavigate())
+      window.setTimeout(doNavigate, 6000)
     }
     board.addEventListener('click', onBoardClick, { capture: true })
     return () => board.removeEventListener('click', onBoardClick, { capture: true })
-  }, [])
+  }, [doNavigate])
 
   // Se não tiver vídeo, dispara a entrada depois de um delay curto.
   useEffect(() => {
@@ -344,11 +359,15 @@ export default function DraggableBoard({ posts, videoSrc, videoPoster, menuItems
   // Direct DOM mutation during drag — no React re-render per pixel.
   const handlePointerMove = useCallback((e: MouseEvent | TouchEvent) => {
     if (!dragRef.current || !boardRef.current) return
-    e.preventDefault()
     const pt = 'touches' in e ? (e as TouchEvent).touches[0]! : (e as MouseEvent)
+    const pxDx = pt.clientX - dragRef.current.startPx
+    const pxDy = pt.clientY - dragRef.current.startPy
+    // Abaixo de ~6px ainda é clique, não arraste — não mexe no card nem marca drag.
+    if (!didDragRef.current && Math.hypot(pxDx, pxDy) < 6) return
+    e.preventDefault()
     const { offsetWidth: W, offsetHeight: H } = boardRef.current
-    const dx = ((pt.clientX - dragRef.current.startPx) / W) * 100
-    const dy = ((pt.clientY - dragRef.current.startPy) / H) * 100
+    const dx = (pxDx / W) * 100
+    const dy = (pxDy / H) * 100
     const x = clamp(dragRef.current.startX + dx, 0, 100)
     const y = clamp(dragRef.current.startY + dy, 0, 100)
     const el = cardRefs.current.get(dragRef.current.postId)
@@ -363,6 +382,8 @@ export default function DraggableBoard({ posts, videoSrc, videoPoster, menuItems
     if (!dragRef.current) return
     const { postId } = dragRef.current
     dragRef.current = null
+    // Não cruzou o limiar: foi clique, não arraste — não salva posição (evita PATCH à toa).
+    if (!didDragRef.current) return
     const el = cardRefs.current.get(postId)
     if (!el) return
 
