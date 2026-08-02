@@ -23,16 +23,16 @@ export const TOOLS: Tool[] = [
     name: 'teleprompter',
     title: 'teleprompter online grátis',
     description:
-      'Teleprompter no navegador pra gravar vídeo lendo seu roteiro: velocidade ajustável, fonte grande, modo espelhado e tela cheia. Sem cadastro.',
+      'Teleprompter no navegador pra gravar vídeo lendo seu roteiro: velocidade ajustável, fonte grande, modo espelhado e tela cheia.',
     status: 'live',
   },
   {
-    slug: 'kit-imagem',
-    name: 'kit de imagem',
-    title: 'converter, comprimir e redimensionar imagem',
+    slug: 'legenda-instagram',
+    name: 'legenda pra instagram',
+    title: 'formatador de legenda pra instagram',
     description:
-      'HEIC pra JPG, compressão e recorte nos formatos de rede social (9:16, 4:5, 1:1) — tudo no navegador, a imagem não sai do seu computador.',
-    status: 'breve',
+      'Quebra de linha que o Instagram respeita, contador de caracteres por rede e preview do corte do "…mais". Escreve, formata e copia pronto pra colar.',
+    status: 'live',
   },
 ]
 

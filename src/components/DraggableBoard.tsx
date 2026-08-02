@@ -519,7 +519,7 @@ export default function DraggableBoard({ posts, videoSrc, videoPoster, menuItems
         )
       })}
 
-      {/* Menu — perspectiva de piso, 3×2, centralizado no bottom */}
+      {/* Menu — perspectiva de piso, 4×2, centralizado no bottom */}
       <div
         className="floor-menu absolute left-1/2 pointer-events-none"
         style={{ bottom: 5, zIndex: 20, transform: 'translateX(-50%)' }}
@@ -528,7 +528,7 @@ export default function DraggableBoard({ posts, videoSrc, videoPoster, menuItems
           className="pointer-events-auto"
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, auto)',
+            gridTemplateColumns: 'repeat(4, auto)',
             gap: 12,
             transform: 'perspective(500px) rotateX(44deg)',
             transformOrigin: 'bottom center',

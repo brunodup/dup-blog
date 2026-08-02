@@ -1,22 +1,55 @@
 import type { Metadata } from 'next'
+import { Caveat } from 'next/font/google'
 import Link from 'next/link'
 
 import LogoLink from '@/components/LogoLink'
+import EmailCaptureCard from '@/components/tools/EmailCaptureCard'
+import {
+  DoodleArrow,
+  DoodleCircle,
+  DoodleSpark,
+  DoodleStep,
+  DoodleUnderline,
+} from '@/components/tools/doodles'
 import { SITE_URL } from '@/lib/seo'
-import { TOOLS } from '@/lib/tools'
+import { TOOLS, getTool } from '@/lib/tools'
+
+// Fonte manuscrita — só nas anotações desta landing.
+const caveat = Caveat({ subsets: ['latin'], weight: ['500', '600'], display: 'swap' })
 
 export const metadata: Metadata = {
   title: 'ferramentas grátis pra quem cria',
   description:
-    'Ferramentas gratuitas de vídeo, foto e texto pra criadores: organizador de roteiro pra reels, teleprompter online e mais. Direto no navegador, sem cadastro.',
+    'Roteiro pra reels, teleprompter e legenda pra instagram — o fluxo do vídeo curto inteiro, grátis e direto no navegador. Em troca, só teu e-mail, uma vez.',
   alternates: { canonical: '/ferramentas' },
   openGraph: {
     type: 'website',
     url: `${SITE_URL}/ferramentas`,
     title: 'ferramentas — brunodup',
-    description: 'Ferramentas gratuitas de vídeo, foto e texto pra criadores.',
+    description: 'O fluxo do vídeo curto inteiro, grátis e direto no navegador.',
   },
 }
+
+const FLUXO = [
+  {
+    n: 1,
+    verbo: 'escreve',
+    slug: 'roteiro-reels',
+    nota: 'hook, desenvolvimento e cta — com a conta de quantos segundos o texto dá',
+  },
+  {
+    n: 2,
+    verbo: 'grava',
+    slug: 'teleprompter',
+    nota: 'lendo a tela, sem decorar nada',
+  },
+  {
+    n: 3,
+    verbo: 'posta',
+    slug: 'legenda-instagram',
+    nota: 'com legenda formatada e quebra de linha que fica',
+  },
+]
 
 function BackButton() {
   return (
@@ -32,6 +65,8 @@ function BackButton() {
   )
 }
 
+const CARD_TILT = ['-rotate-1', 'rotate-1', '-rotate-[0.5deg]']
+
 export default function FerramentasPage() {
   return (
     <div className="min-h-screen bg-white">
@@ -42,47 +77,113 @@ export default function FerramentasPage() {
           <BackButton />
         </nav>
 
-        <h1 className="font-switzer text-[1.75rem] font-semibold leading-tight tracking-tight text-black mb-2">
-          Ferramentas
-        </h1>
-        <p className="max-w-[680px] text-[1rem] leading-relaxed text-[#333] mb-10">
-          Ferramentas gratuitas pra quem cria — vídeo, foto, texto. Tudo roda no seu
-          navegador, sem cadastro e sem enviar nada pra servidor nenhum.
-        </p>
+        {/* ── hero ─────────────────────────────────────────────────────────── */}
+        <header className="sketch-grid rounded-md -mx-2 px-2 py-10 md:py-14 mb-14">
+          <p className="text-[11px] font-mono uppercase tracking-widest text-gray-400 mb-4">
+            ferramentas · grátis
+          </p>
+          <h1 className="font-switzer text-[2rem] md:text-[2.6rem] font-semibold leading-tight tracking-tight text-black max-w-[680px]">
+            ferramentas{' '}
+            <span className="relative inline-block">
+              grátis
+              <DoodleUnderline className="absolute -bottom-1 left-0 w-full h-[10px] text-gray-500" />
+            </span>{' '}
+            pra quem cria vídeo curto
+          </h1>
+          <p className="max-w-[560px] text-[1rem] leading-relaxed text-[#333] mt-5">
+            Do rascunho ao post: você escreve o roteiro, grava lendo o teleprompter
+            e sai com a legenda formatada. Tudo no navegador — nada é instalado,
+            nada do que você escreve sai da tua máquina.
+          </p>
+          <div className="flex items-center gap-2 mt-6 text-gray-500">
+            <span className={`${caveat.className} text-xl -rotate-2`}>o fluxo inteiro, aqui embaixo</span>
+            <DoodleArrow className="w-12 h-8 rotate-45" />
+          </div>
+        </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {TOOLS.map((tool, i) => {
-            const inner = (
-              <>
-                <p className="text-[10px] font-mono uppercase tracking-widest text-gray-400 mb-3">
-                  {tool.status === 'live' ? 'grátis' : 'em breve'}
-                </p>
-                <p className="text-base font-medium text-black leading-snug">{tool.name}</p>
-                <p className="text-sm leading-relaxed text-[#555] mt-2">{tool.description}</p>
-              </>
-            )
-            return (
-              <div
-                key={tool.slug}
-                className="animate-slide-up"
-                style={{ animationDelay: `${i * 0.06}s` }}
-              >
-                {tool.status === 'live' ? (
-                  <Link
-                    href={`/ferramentas/${tool.slug}`}
-                    className="block h-full border border-gray-200 rounded-md p-6 hover:border-black transition-colors"
-                  >
-                    {inner}
-                  </Link>
-                ) : (
-                  <div className="h-full border border-gray-100 rounded-md p-6 opacity-60">
-                    {inner}
+        {/* ── o fluxo ──────────────────────────────────────────────────────── */}
+        <section className="mb-16">
+          <h2 className="text-[11px] font-mono uppercase tracking-widest text-gray-400 mb-8">
+            Como funciona
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 max-w-[900px]">
+            {FLUXO.map((passo, i) => {
+              const tool = getTool(passo.slug)
+              return (
+                <div key={passo.n} className="relative">
+                  {i > 0 && (
+                    <DoodleArrow className="hidden md:block absolute -left-8 top-2 w-10 h-7 text-gray-300" />
+                  )}
+                  <div className="flex items-center gap-3 mb-2">
+                    <DoodleStep n={passo.n} className="text-gray-500" />
+                    <span className={`${caveat.className} text-2xl text-black`}>{passo.verbo}</span>
                   </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
+                  <p className="text-sm leading-relaxed text-[#555] mb-2">{passo.nota}</p>
+                  {tool && tool.status === 'live' && (
+                    <Link
+                      href={`/ferramentas/${tool.slug}`}
+                      className="text-[11px] font-mono uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
+                    >
+                      {tool.name} →
+                    </Link>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* ── as ferramentas ───────────────────────────────────────────────── */}
+        <section className="mb-20">
+          <h2 className="text-[11px] font-mono uppercase tracking-widest text-gray-400 mb-8">
+            As ferramentas
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-[900px]">
+            {TOOLS.map((tool, i) => {
+              const inner = (
+                <>
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-gray-400 mb-3">
+                    {tool.status === 'live' ? 'grátis' : 'em breve'}
+                  </p>
+                  <p className="text-base font-medium text-black leading-snug">{tool.name}</p>
+                  <p className="text-sm leading-relaxed text-[#555] mt-2">{tool.description}</p>
+                </>
+              )
+              return (
+                <div
+                  key={tool.slug}
+                  className={`animate-slide-up ${CARD_TILT[i % CARD_TILT.length]}`}
+                  style={{ animationDelay: `${i * 0.06}s` }}
+                >
+                  {tool.status === 'live' ? (
+                    <Link
+                      href={`/ferramentas/${tool.slug}`}
+                      className="block h-full border border-gray-200 rounded-md p-6 hover:border-black hover:rotate-0 transition-all duration-200"
+                    >
+                      {inner}
+                    </Link>
+                  ) : (
+                    <div className="h-full border border-dashed border-gray-300 rounded-md p-6 opacity-60">
+                      {inner}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* ── captação ─────────────────────────────────────────────────────── */}
+        <section className="relative max-w-[900px]">
+          <div className="flex items-start gap-3 mb-4 text-gray-500">
+            <DoodleSpark className="w-5 h-5 mt-1" />
+            <span className={`${caveat.className} text-xl rotate-1`}>a parte do combinado</span>
+          </div>
+          <EmailCaptureCard handClass={caveat.className} />
+          <div className="hidden md:block absolute right-[15%] top-8 text-gray-200 pointer-events-none">
+            <DoodleCircle className="w-36 h-14" />
+          </div>
+        </section>
       </div>
     </div>
   )

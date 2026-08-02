@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import EmailGate from './EmailGate'
+import { hasStoredEmail } from './leadClient'
 import { loadRoteiros, roteiroToText, type Roteiro } from './roteiroStorage'
 
 const TEXT_KEY = 'dup-tools:teleprompter-texto'
@@ -28,6 +30,7 @@ export default function Teleprompter() {
   const [running, setRunning] = useState(false)
   const [playing, setPlaying] = useState(false)
   const [countdown, setCountdown] = useState<number | null>(null)
+  const [gateOpen, setGateOpen] = useState(false)
 
   const viewportRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
@@ -94,6 +97,11 @@ export default function Teleprompter() {
 
   const start = () => {
     if (!text.trim()) return
+    // Pede o e-mail uma única vez por navegador antes de rodar.
+    if (!hasStoredEmail()) {
+      setGateOpen(true)
+      return
+    }
     offsetRef.current = 0
     setRunning(true)
     setCountdown(3)
@@ -258,6 +266,19 @@ export default function Teleprompter() {
           espaço rola/pausa · setas mudam a velocidade · esc sai
         </span>
       </div>
+
+      {gateOpen && (
+        <EmailGate
+          source="teleprompter"
+          onDone={() => {
+            setGateOpen(false)
+            offsetRef.current = 0
+            setRunning(true)
+            setCountdown(3)
+          }}
+          onClose={() => setGateOpen(false)}
+        />
+      )}
     </div>
   )
 }

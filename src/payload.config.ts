@@ -12,6 +12,7 @@ import { Media } from './collections/Media'
 import { Posts } from './collections/Posts'
 import { Categories } from './collections/Categories'
 import { Pages } from './collections/Pages'
+import { Leads } from './collections/Leads'
 import { Menu } from './globals/Menu'
 
 const filename = fileURLToPath(import.meta.url)
@@ -31,7 +32,7 @@ export default buildConfig({
       titleSuffix: ' · brunodup',
     },
   },
-  collections: [Posts, Media, Users, Categories, Pages],
+  collections: [Posts, Media, Users, Categories, Pages, Leads],
   globals: [Menu],
   editor: lexicalEditor(),
   plugins: [

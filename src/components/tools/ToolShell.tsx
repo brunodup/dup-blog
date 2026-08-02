@@ -79,7 +79,7 @@ export default function ToolShell({
         <nav className="mb-10 flex items-center justify-between">
           <BackButton />
           <span className="text-[11px] font-mono uppercase tracking-widest text-gray-300">
-            grátis · sem cadastro
+            grátis · direto no navegador
           </span>
         </nav>
 
@@ -113,6 +113,7 @@ export default function ToolShell({
             <h2 className="text-[11px] font-mono uppercase tracking-widest text-gray-400 mb-6">
               Vai bem com
             </h2>
+            <div className="space-y-3">
             {others.map((t) => (
               <Link
                 key={t.slug}
@@ -125,6 +126,7 @@ export default function ToolShell({
                 <p className="text-sm text-[#555] mt-1">{t.description}</p>
               </Link>
             ))}
+            </div>
           </section>
         )}
       </div>

@@ -65,9 +65,19 @@
   .board-title {
     font-size: 55px !important;
   }
+  /* 4 colunas não cabem em tela estreita no tamanho cheio:
+     botão compacto + gap menor + escala pra fechar em ~330px de largura. */
   .floor-menu {
-    transform: translateX(-50%) scale(0.85) !important;
+    transform: translateX(-50%) scale(0.7) !important;
     transform-origin: bottom center;
+  }
+  .floor-menu nav {
+    gap: 8px !important;
+  }
+  .floor-btn {
+    border-width: 3px !important;
+    padding: 10px 14px !important;
+    font-size: 0.72rem !important;
   }
 }
 
@@ -77,6 +87,15 @@
 }
 #nprogress .peg {
   box-shadow: 0 0 10px #38bdf8, 0 0 5px #38bdf8 !important;
+}
+
+/* ── Sketch (landing de ferramentas) ────────────────────────────────────────── */
+/* Papel quadriculado sutil — linhas-guia de rascunho. */
+.sketch-grid {
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
 
 /* ── Animations ─────────────────────────────────────────────────────────────── */
