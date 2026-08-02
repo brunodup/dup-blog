@@ -1,17 +1,13 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
 import config from '@payload-config'
-import type { Media, Post } from '@/payload-types'
 import LogoLink from '@/components/LogoLink'
+import PostCard from '@/components/PostCard'
+import { PUBLISHED } from '@/lib/seo'
 
 export const revalidate = 60
-
-function isMedia(m: unknown): m is Media {
-  return typeof m === 'object' && m !== null && 'url' in m
-}
 
 // ── Shell ─────────────────────────────────────────────────────────────────────
 
@@ -25,50 +21,6 @@ function BackButton() {
         <path d="M9 12L4 7l5-5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
       voltar
-    </Link>
-  )
-}
-
-// ── Post card ─────────────────────────────────────────────────────────────────
-
-const TYPE_LABEL: Record<string, string> = {
-  text: 'texto', image: 'imagem', quote: 'citação',
-  video: 'vídeo', audio: 'áudio', snippet: 'snippet',
-}
-
-function PostCard({ post }: { post: Post }) {
-  const p = post as Post & { thumbnail?: unknown }
-  const media   = isMedia(post.media)  ? post.media  : null
-  const thumb   = isMedia(p.thumbnail) ? p.thumbnail : null
-  const imgSrc  = media?.sizes?.card?.url ?? media?.url ?? thumb?.url ?? null
-
-  return (
-    <Link href={`/post/${post.slug}`} className="group block">
-      <div className="relative aspect-[4/3] rounded-md overflow-hidden bg-gray-100 mb-2">
-        {imgSrc ? (
-          <Image
-            src={imgSrc}
-            alt={post.title || ''}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 680px) 50vw, 25vw"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-gray-300">
-              {TYPE_LABEL[post.type ?? 'text'] ?? post.type}
-            </span>
-          </div>
-        )}
-      </div>
-      {post.title && (
-        <p className="text-sm font-medium text-black leading-snug line-clamp-2 group-hover:underline underline-offset-2">
-          {post.title}
-        </p>
-      )}
-      <p className="text-[11px] text-gray-400 mt-0.5 uppercase tracking-widest">
-        {TYPE_LABEL[post.type ?? 'text'] ?? post.type}
-      </p>
     </Link>
   )
 }
@@ -87,7 +39,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   })
   const cat = docs[0]
   if (!cat) return {}
-  return { title: `${cat.name} — brunodup` }
+  return {
+    title: cat.name,
+    description: `Posts sobre ${cat.name.toLowerCase()} no mural de Bruno Dup.`,
+    alternates: { canonical: `/categoria/${cat.slug}` },
+  }
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -109,10 +65,10 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
   const { docs: posts } = await payload.find({
     collection: 'posts',
-    where: { categories: { in: [category.id] } },
+    where: { and: [{ categories: { in: [category.id] } }, PUBLISHED] },
     depth: 1,
     limit: 100,
-    sort: '-createdAt',
+    sort: '-publishedAt',
     overrideAccess: true,
   })
 
@@ -121,8 +77,14 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       <LogoLink className="board-title text-black select-none" />
 
       <div className="w-[95%] mx-auto pt-2 pb-24 md:w-auto md:max-w-[90vw] md:px-6">
-        <nav className="mb-10">
+        <nav className="mb-10 flex items-center justify-between">
           <BackButton />
+          <Link
+            href="/blog"
+            className="text-xs tracking-widest uppercase text-gray-400 hover:text-black transition-colors duration-150"
+          >
+            todos os posts →
+          </Link>
         </nav>
 
         <h1 className="font-switzer text-[1.75rem] font-semibold leading-tight tracking-tight text-black mb-2">

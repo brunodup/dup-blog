@@ -1,15 +1,25 @@
 import { RichText } from '@payloadcms/richtext-lexical/react'
-import Image from 'next/image'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
 import config from '@payload-config'
-import type { Media, Post } from '@/payload-types'
+import type { Category, Media, Post } from '@/payload-types'
 import CodePlayground from '@/components/CodePlayground'
 import ImageWithModal from '@/components/ImageWithModal'
 import LogoLink from '@/components/LogoLink'
+import PostCard from '@/components/PostCard'
 import type { JsMode } from '@/lib/playground'
+import {
+  PUBLISHED,
+  SITE_NAME,
+  SITE_URL,
+  getPostBySlug,
+  postDescription,
+  postImage,
+  postTitle,
+} from '@/lib/seo'
 
 export const revalidate = 60
 
@@ -48,8 +58,14 @@ function PostShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-white">
       <LogoLink className="board-title text-black select-none" />
       <div className="w-[95%] mx-auto pt-2 pb-24 md:w-auto md:max-w-[90vw] md:px-6">
-        <nav className="mb-14">
+        <nav className="mb-14 flex items-center justify-between">
           <BackButton />
+          <Link
+            href="/blog"
+            className="text-xs tracking-widest uppercase text-gray-400 hover:text-black transition-colors duration-150"
+          >
+            todos os posts →
+          </Link>
         </nav>
         <article>{children}</article>
       </div>
@@ -195,48 +211,6 @@ function PostContent({ post }: { post: Post }) {
 
 // ── Veja também ───────────────────────────────────────────────────────────────
 
-const TYPE_LABEL: Record<string, string> = {
-  text: 'texto', image: 'imagem', quote: 'citação',
-  video: 'vídeo', audio: 'áudio', snippet: 'snippet',
-}
-
-function RelatedCard({ post }: { post: Post }) {
-  const p = post as Post & { thumbnail?: unknown }
-  const media   = isMedia(post.media)    ? post.media    : null
-  const thumb   = isMedia(p.thumbnail)   ? p.thumbnail   : null
-  const imgSrc  = media?.sizes?.card?.url ?? media?.url ?? thumb?.url ?? null
-
-  return (
-    <Link href={`/post/${post.slug}`} className="group block">
-      <div className="relative aspect-[4/3] rounded-md overflow-hidden bg-gray-100 mb-2">
-        {imgSrc ? (
-          <Image
-            src={imgSrc}
-            alt={post.title || ''}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 680px) 50vw, 160px"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-gray-300">
-              {TYPE_LABEL[post.type ?? 'text'] ?? post.type}
-            </span>
-          </div>
-        )}
-      </div>
-      {post.title && (
-        <p className="text-sm font-medium text-black leading-snug line-clamp-2 group-hover:underline underline-offset-2">
-          {post.title}
-        </p>
-      )}
-      <p className="text-[11px] text-gray-400 mt-0.5 uppercase tracking-widest">
-        {TYPE_LABEL[post.type ?? 'text'] ?? post.type}
-      </p>
-    </Link>
-  )
-}
-
 function RelatedPosts({ posts }: { posts: Post[] }) {
   if (posts.length === 0) return null
   return (
@@ -246,50 +220,163 @@ function RelatedPosts({ posts }: { posts: Post[] }) {
       </h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {posts.map((p) => (
-          <RelatedCard key={p.id} post={p} />
+          <PostCard key={p.id} post={p} sizes="(max-width: 680px) 50vw, 160px" />
         ))}
       </div>
     </div>
   )
 }
 
+// ── Anterior / próximo ────────────────────────────────────────────────────────
+
+function PagerLink({
+  post,
+  direction,
+}: {
+  post: Post | null
+  direction: 'prev' | 'next'
+}) {
+  if (!post) return <span />
+  const isNext = direction === 'next'
+  return (
+    <Link
+      href={`/post/${post.slug}`}
+      className={`group flex flex-col gap-1 ${isNext ? 'items-end text-right' : 'items-start'}`}
+    >
+      <span className="text-[11px] font-mono uppercase tracking-widest text-gray-400 group-hover:text-black transition-colors">
+        {isNext ? 'próximo →' : '← anterior'}
+      </span>
+      {post.title && (
+        <span className="text-sm font-medium text-black leading-snug line-clamp-1 group-hover:underline underline-offset-2">
+          {post.title}
+        </span>
+      )}
+    </Link>
+  )
+}
+
+function PostPager({ prev, next }: { prev: Post | null; next: Post | null }) {
+  if (!prev && !next) return null
+  return (
+    <nav className="mt-10 pt-6 border-t border-gray-100 grid grid-cols-2 gap-6">
+      <PagerLink post={prev} direction="prev" />
+      <PagerLink post={next} direction="next" />
+    </nav>
+  )
+}
+
 // ── SEO ───────────────────────────────────────────────────────────────────────
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+export async function generateStaticParams() {
   const payload = await getPayload({ config })
-
   const { docs } = await payload.find({
     collection: 'posts',
-    where: { slug: { equals: slug } },
+    where: PUBLISHED,
     depth: 0,
-    limit: 1,
+    limit: 500,
+    select: { slug: true },
     overrideAccess: true,
   })
+  return docs.filter((p) => p.slug).map((p) => ({ slug: p.slug as string }))
+}
 
-  const post = docs[0]
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const post = await getPostBySlug(slug)
   if (!post) return {}
 
+  const title = postTitle(post)
+  const description = postDescription(post)
+  const image = postImage(post)
+  const url = `/post/${post.slug}`
+  const p = post as Post & { publishedAt?: string | null }
+
   return {
-    title: post.title ? `${post.title} — brunodup` : 'brunodup',
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'article',
+      url,
+      title,
+      description,
+      siteName: SITE_NAME,
+      locale: 'pt_BR',
+      publishedTime: p.publishedAt ?? post.createdAt,
+      modifiedTime: post.updatedAt,
+      ...(image ? { images: [image] } : {}),
+    },
+    twitter: {
+      card: image ? 'summary_large_image' : 'summary',
+      title,
+      description,
+    },
   }
+}
+
+function PostJsonLd({ post }: { post: Post }) {
+  const p = post as Post & { publishedAt?: string | null }
+  const image = postImage(post)
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: postTitle(post),
+    description: postDescription(post),
+    url: `${SITE_URL}/post/${post.slug}`,
+    datePublished: p.publishedAt ?? post.createdAt,
+    dateModified: post.updatedAt,
+    inLanguage: 'pt-BR',
+    author: { '@type': 'Person', name: 'Bruno Dup', url: SITE_URL },
+    ...(image ? { image: image.url } : {}),
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/post/${post.slug}` },
+  }
+  return (
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+  )
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
+function PostMeta({ post }: { post: Post }) {
+  const p = post as Post & { publishedAt?: string | null; categories?: unknown[] }
+  const cats = (p.categories ?? []).filter(
+    (c): c is Category => typeof c === 'object' && c !== null && 'name' in c,
+  )
+  const date = p.publishedAt ?? post.createdAt
+  const formatted = date
+    ? new Date(date).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+    : null
+
+  if (!formatted && cats.length === 0) return null
+
+  return (
+    <footer className="mt-12 pt-6 border-t border-gray-100 flex flex-wrap items-center gap-x-4 gap-y-2">
+      {formatted && (
+        <time
+          dateTime={date ?? undefined}
+          className="text-[11px] font-mono uppercase tracking-widest text-gray-400"
+        >
+          {formatted}
+        </time>
+      )}
+      {cats.map((cat) =>
+        cat.slug ? (
+          <Link
+            key={cat.id}
+            href={`/categoria/${cat.slug}`}
+            className="text-[11px] font-mono uppercase tracking-widest text-gray-400 hover:text-black transition-colors border border-gray-200 rounded-full px-3 py-1"
+          >
+            {cat.name}
+          </Link>
+        ) : null,
+      )}
+    </footer>
+  )
+}
+
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const payload = await getPayload({ config })
-
-  const { docs } = await payload.find({
-    collection: 'posts',
-    where: { slug: { equals: slug } },
-    depth: 1,
-    limit: 1,
-    overrideAccess: true,
-  })
-
-  const post = docs[0]
+  const post = await getPostBySlug(slug)
   if (!post) notFound()
 
   // Extrai IDs de categorias do post atual (depth:1 → objetos populados)
@@ -299,29 +386,52 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     .map((c) => (typeof c === 'object' && c !== null ? (c as { id: number }).id : (c as number)))
     .filter(Boolean)
 
-  // Só busca relacionados se o post tiver ao menos uma categoria
-  let related: Post[] = []
-  if (categoryIds.length > 0) {
-    const { docs: relDocs } = await payload.find({
+  const payload = await getPayload({ config })
+  const pDate = (post as Post & { publishedAt?: string | null }).publishedAt ?? post.createdAt
+
+  const [relatedRes, prevRes, nextRes] = await Promise.all([
+    // Só busca relacionados se o post tiver ao menos uma categoria
+    categoryIds.length > 0
+      ? payload.find({
+          collection: 'posts',
+          where: {
+            and: [
+              { slug: { not_equals: slug } },
+              { categories: { in: categoryIds } },
+              PUBLISHED,
+            ],
+          },
+          depth: 1,
+          limit: 4,
+          sort: '-publishedAt',
+          overrideAccess: true,
+        })
+      : Promise.resolve({ docs: [] as Post[] }),
+    payload.find({
       collection: 'posts',
-      where: {
-        and: [
-          { slug: { not_equals: slug } },
-          { categories: { in: categoryIds } },
-        ],
-      },
-      depth: 1,
-      limit: 4,
-      sort: '-createdAt',
+      where: { and: [{ publishedAt: { less_than: pDate } }, { slug: { not_equals: slug } }, PUBLISHED] },
+      depth: 0,
+      limit: 1,
+      sort: '-publishedAt',
       overrideAccess: true,
-    })
-    related = relDocs
-  }
+    }),
+    payload.find({
+      collection: 'posts',
+      where: { and: [{ publishedAt: { greater_than: pDate } }, { slug: { not_equals: slug } }, PUBLISHED] },
+      depth: 0,
+      limit: 1,
+      sort: 'publishedAt',
+      overrideAccess: true,
+    }),
+  ])
 
   return (
     <PostShell>
+      <PostJsonLd post={post} />
       <PostContent post={post} />
-      <RelatedPosts posts={related} />
+      <PostMeta post={post} />
+      <PostPager prev={prevRes.docs[0] ?? null} next={nextRes.docs[0] ?? null} />
+      <RelatedPosts posts={relatedRes.docs} />
     </PostShell>
   )
 }
