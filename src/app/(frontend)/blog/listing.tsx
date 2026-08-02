@@ -3,10 +3,14 @@ import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
 import config from '@payload-config'
-import BlogIntro from '@/components/BlogIntro'
 import LogoLink from '@/components/LogoLink'
 import PostCard from '@/components/PostCard'
+import VideoBackdrop from '@/components/tools/VideoBackdrop'
 import { PUBLISHED } from '@/lib/seo'
+
+// Painel de conteúdo "janela" sobre o vídeo de fundo — largura reduzida no
+// desktop pra deixar o vídeo visível nas bordas; full-bleed branco no mobile.
+const PANEL = 'w-[95%] mx-auto md:w-auto md:max-w-[70vw] bg-white/95 backdrop-blur-sm rounded-lg shadow-[0_2px_20px_rgba(0,0,0,0.08)] px-5 py-8 md:px-10 md:py-12 mt-6 md:mt-10 mb-16 md:mb-20'
 
 export const PER_PAGE = 24
 
@@ -83,11 +87,11 @@ export async function BlogListing({ page }: { page: number }) {
   if (page > 1 && posts.length === 0) notFound()
 
   return (
-    <div className="min-h-screen bg-white">
-      <BlogIntro />
+    <VideoBackdrop src="/bg-blog.mp4" poster="/bg-blog-poster.jpg" pauseAt={2.5}>
+    <div className="min-h-screen">
       <LogoLink className="board-title text-black select-none" />
 
-      <div className="w-[95%] mx-auto pt-2 pb-24 md:w-auto md:max-w-[90vw] md:px-6">
+      <div className={PANEL}>
         <nav className="mb-10 flex items-center justify-between">
           <BackButton />
           <Link
@@ -140,5 +144,6 @@ export async function BlogListing({ page }: { page: number }) {
         <Pagination page={page} totalPages={totalPages} />
       </div>
     </div>
+    </VideoBackdrop>
   )
 }

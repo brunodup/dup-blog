@@ -2,10 +2,16 @@ import Link from 'next/link'
 
 import LogoLink from '@/components/LogoLink'
 import ToolGate from '@/components/tools/ToolGate'
+import VideoBackdrop from '@/components/tools/VideoBackdrop'
 import { SITE_URL } from '@/lib/seo'
 import { TOOLS, type Tool } from '@/lib/tools'
 
 export type Faq = { q: string; a: string }
+
+// Painel de conteúdo "janela" sobre o vídeo de fundo — mesmo tratamento do
+// blog/post/categoria. Aqui também segura os inputs da ferramenta em fundo
+// sólido (textarea/select sobre vídeo direto ficaria ilegível).
+const PANEL = 'w-[95%] mx-auto md:w-auto md:max-w-[70vw] bg-white/95 backdrop-blur-sm rounded-lg shadow-[0_2px_20px_rgba(0,0,0,0.08)] px-5 py-8 md:px-10 md:py-12 mt-6 md:mt-10 mb-16 md:mb-20'
 
 function BackButton() {
   return (
@@ -72,11 +78,12 @@ export default function ToolShell({
   const others = TOOLS.filter((t) => t.slug !== tool.slug && t.status === 'live')
 
   return (
-    <div className="min-h-screen bg-white">
+    <VideoBackdrop src="/bg-tools.mp4" poster="/bg-tools-poster.jpg">
+    <div className="min-h-screen">
       <ToolJsonLd tool={tool} faq={faq} />
       <LogoLink className="board-title text-black select-none" />
 
-      <div className="w-[95%] mx-auto pt-2 pb-24 md:w-auto md:max-w-[90vw] md:px-6">
+      <div className={PANEL}>
         <nav className="mb-10 flex items-center justify-between">
           <BackButton />
           <span className="text-[11px] font-mono uppercase tracking-widest text-gray-300">
@@ -144,5 +151,6 @@ export default function ToolShell({
         )}
       </div>
     </div>
+    </VideoBackdrop>
   )
 }

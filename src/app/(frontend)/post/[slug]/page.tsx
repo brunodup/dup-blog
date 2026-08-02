@@ -6,11 +6,11 @@ import { getPayload } from 'payload'
 
 import config from '@payload-config'
 import type { Category, Media, Post } from '@/payload-types'
-import BlogIntro from '@/components/BlogIntro'
 import CodePlayground from '@/components/CodePlayground'
 import ImageWithModal from '@/components/ImageWithModal'
 import LogoLink from '@/components/LogoLink'
 import PostCard from '@/components/PostCard'
+import VideoBackdrop from '@/components/tools/VideoBackdrop'
 import type { JsMode } from '@/lib/playground'
 import {
   PUBLISHED,
@@ -23,6 +23,10 @@ import {
 } from '@/lib/seo'
 
 export const revalidate = 60
+
+// Painel de conteúdo "janela" sobre o vídeo de fundo — largura reduzida no
+// desktop pra deixar o vídeo visível nas bordas; full-bleed branco no mobile.
+const PANEL = 'w-[95%] mx-auto md:w-auto md:max-w-[70vw] bg-white/95 backdrop-blur-sm rounded-lg shadow-[0_2px_20px_rgba(0,0,0,0.08)] px-5 py-8 md:px-10 md:py-12 mt-6 md:mt-10 mb-16 md:mb-20'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -56,10 +60,10 @@ function BackButton() {
 
 function PostShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-white">
-      <BlogIntro />
+    <VideoBackdrop src="/bg-blog.mp4" poster="/bg-blog-poster.jpg" pauseAt={2.5}>
+    <div className="min-h-screen">
       <LogoLink className="board-title text-black select-none" />
-      <div className="w-[95%] mx-auto pt-2 pb-24 md:w-auto md:max-w-[90vw] md:px-6">
+      <div className={PANEL}>
         <nav className="mb-14 flex items-center justify-between">
           <BackButton />
           <Link
@@ -72,6 +76,7 @@ function PostShell({ children }: { children: React.ReactNode }) {
         <article>{children}</article>
       </div>
     </div>
+    </VideoBackdrop>
   )
 }
 
