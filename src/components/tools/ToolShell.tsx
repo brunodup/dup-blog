@@ -93,6 +93,18 @@ export default function ToolShell({
 
         <ToolGate source={tool.slug}>{children}</ToolGate>
 
+        <aside className="max-w-[680px] mt-10 border border-dashed border-gray-300 rounded-md p-4">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-gray-400 mb-1.5">
+            onde tuas coisas ficam salvas
+          </p>
+          <p className="text-sm leading-relaxed text-[#555]">
+            O que você cria aqui fica guardado no teu navegador, como um cookie —
+            voltando pelo mesmo navegador, tá tudo no lugar. Mas não existe conta
+            nem histórico no servidor: se limpar os dados do navegador, perde tudo.
+            Copia o que for importante pra um lugar seguro.
+          </p>
+        </aside>
+
         {faq.length > 0 && (
           <section className="max-w-[680px] mt-16 pt-10 border-t border-gray-100">
             <h2 className="text-[11px] font-mono uppercase tracking-widest text-gray-400 mb-6">
