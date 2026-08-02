@@ -164,7 +164,7 @@ export default function RoteiroReels() {
                 value={cur[s.key]}
                 onChange={(e) => set({ [s.key]: e.target.value })}
                 rows={s.rows}
-                className="w-full border border-gray-200 rounded-md p-3 text-sm leading-relaxed text-[#333] placeholder:text-gray-300 outline-none focus:border-black transition-colors resize-y"
+                className="w-full border border-gray-200 rounded-md p-3 text-sm leading-relaxed text-[#333] placeholder:text-gray-300 outline-none focus:border-black transition-colors resize-y bg-white"
               />
             </div>
           )

@@ -140,7 +140,7 @@ export default function LegendaInstagram() {
         onChange={(e) => setText(e.target.value)}
         rows={9}
         placeholder={'escreve a legenda aqui…\n\nquebra de linha do jeito que você quer que apareça — a formatação segura elas no lugar.'}
-        className="w-full border border-gray-200 rounded-md p-3 text-sm leading-relaxed text-[#333] placeholder:text-gray-300 outline-none focus:border-black transition-colors resize-y"
+        className="w-full border border-gray-200 rounded-md p-3 text-sm leading-relaxed text-[#333] placeholder:text-gray-300 outline-none focus:border-black transition-colors resize-y bg-white"
       />
 
       {/* contadores */}

@@ -8,10 +8,12 @@ interface Props {
   src: string
   poster?: string
   pauseAt?: number
+  /** Renderizado por cima do vídeo, fora da área que esmaece na saída — pro logo, por exemplo. */
+  persistent?: React.ReactNode
   children: React.ReactNode
 }
 
-export default function VideoBackdrop({ src, poster, pauseAt = 2.2, children }: Props) {
+export default function VideoBackdrop({ src, poster, pauseAt = 2.2, persistent, children }: Props) {
   const router = useRouter()
   const topLoader = useTopLoader()
 
@@ -107,6 +109,7 @@ export default function VideoBackdrop({ src, poster, pauseAt = 2.2, children }: 
           onError={handleError}
         />
       </div>
+      {persistent && <div className="relative z-20">{persistent}</div>}
       <div
         ref={contentRef}
         className={`relative z-10 transition-opacity duration-500${exiting ? ' opacity-0' : ''}`}

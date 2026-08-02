@@ -70,10 +70,12 @@ const CARD_TILT = ['-rotate-1', 'rotate-1', '-rotate-[0.5deg]']
 
 export default function FerramentasPage() {
   return (
-    <VideoBackdrop src="/bg-tools.mp4" poster="/bg-tools-poster.jpg">
+    <VideoBackdrop
+      src="/bg-tools.mp4"
+      poster="/bg-tools-poster.jpg"
+      persistent={<LogoLink className="board-title text-black select-none" />}
+    >
     <div className="min-h-screen">
-      <LogoLink className="board-title text-black select-none" />
-
       <div className="w-[95%] mx-auto pt-2 pb-24 md:w-auto md:max-w-[90vw] md:px-6">
         <nav className="mb-10">
           <BackButton />

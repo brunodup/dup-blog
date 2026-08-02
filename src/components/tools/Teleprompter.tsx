@@ -242,7 +242,7 @@ export default function Teleprompter() {
         onChange={(e) => setText(e.target.value)}
         rows={10}
         placeholder="cola aqui o que você vai falar…"
-        className="w-full border border-gray-200 rounded-md p-3 text-sm leading-relaxed text-[#333] placeholder:text-gray-300 outline-none focus:border-black transition-colors resize-y"
+        className="w-full border border-gray-200 rounded-md p-3 text-sm leading-relaxed text-[#333] placeholder:text-gray-300 outline-none focus:border-black transition-colors resize-y bg-white"
       />
 
       <div className="flex flex-wrap items-center gap-3 mt-6">

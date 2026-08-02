@@ -24,9 +24,10 @@ import {
 
 export const revalidate = 60
 
-// Painel de conteúdo "janela" sobre o vídeo de fundo — largura reduzida no
-// desktop pra deixar o vídeo visível nas bordas; full-bleed branco no mobile.
-const PANEL = 'w-[95%] mx-auto md:w-auto md:max-w-[70vw] bg-white/95 backdrop-blur-sm rounded-lg shadow-[0_2px_20px_rgba(0,0,0,0.08)] px-5 py-8 md:px-10 md:py-12 mt-6 md:mt-10 mb-16 md:mb-20'
+// Conteúdo à esquerda sobre o vídeo de fundo, sem painel — mesma estrutura
+// do hub /ferramentas: largura contida (70vw) e não centralizada, deixando
+// o vídeo visível à direita.
+const CONTENT = 'w-[95%] mx-auto pt-2 pb-24 md:w-auto md:max-w-[70vw] md:mx-0 md:ml-[5vw] md:pr-6'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -60,10 +61,14 @@ function BackButton() {
 
 function PostShell({ children }: { children: React.ReactNode }) {
   return (
-    <VideoBackdrop src="/bg-blog.mp4" poster="/bg-blog-poster.jpg" pauseAt={2.5}>
+    <VideoBackdrop
+      src="/bg-blog.mp4"
+      poster="/bg-blog-poster.jpg"
+      pauseAt={2.5}
+      persistent={<LogoLink className="board-title text-black select-none" />}
+    >
     <div className="min-h-screen">
-      <LogoLink className="board-title text-black select-none" />
-      <div className={PANEL}>
+      <div className={CONTENT}>
         <nav className="mb-14 flex items-center justify-between">
           <BackButton />
           <Link
