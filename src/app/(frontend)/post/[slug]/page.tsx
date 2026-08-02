@@ -27,7 +27,7 @@ export const revalidate = 60
 // Conteúdo à esquerda sobre o vídeo de fundo, sem painel — mesma estrutura
 // do hub /ferramentas: largura contida (70vw) e não centralizada, deixando
 // o vídeo visível à direita.
-const CONTENT = 'w-[95%] mx-auto pt-2 pb-24 px-5 bg-white md:w-auto md:max-w-[70vw] md:mx-0 md:ml-[5vw] md:px-10'
+const CONTENT = 'w-[95%] mx-auto mt-4 mb-16 p-6 bg-white/30 backdrop-blur-md rounded-[20px] md:w-auto md:max-w-[70vw] md:mx-0 md:ml-[5vw] md:mt-8 md:mb-24 md:p-[60px]'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
