@@ -18,15 +18,15 @@ import { TOOLS, getTool } from '@/lib/tools'
 const caveat = Caveat({ subsets: ['latin'], weight: ['500', '600'], display: 'swap' })
 
 export const metadata: Metadata = {
-  title: 'ferramentas grátis pra quem cria',
+  title: 'ferramentas grátis pra quem cria vídeo',
   description:
-    'Roteiro pra reels, teleprompter e legenda pra instagram — o fluxo do vídeo curto inteiro, grátis e direto no navegador. Em troca, só teu e-mail, uma vez.',
+    'Roteiro, teleprompter e legenda — do rascunho ao post, grátis e direto no navegador. Em troca, só teu e-mail, uma vez.',
   alternates: { canonical: '/ferramentas' },
   openGraph: {
     type: 'website',
     url: `${SITE_URL}/ferramentas`,
     title: 'ferramentas — brunodup',
-    description: 'O fluxo do vídeo curto inteiro, grátis e direto no navegador.',
+    description: 'Do rascunho ao post, grátis e direto no navegador.',
   },
 }
 
@@ -78,7 +78,7 @@ export default function FerramentasPage() {
         </nav>
 
         {/* ── hero ─────────────────────────────────────────────────────────── */}
-        <header className="sketch-grid rounded-md -mx-2 px-2 py-10 md:py-14 mb-14">
+        <header className="py-8 md:py-12 mb-14">
           <p className="text-[11px] font-mono uppercase tracking-widest text-gray-400 mb-4">
             ferramentas · grátis
           </p>
@@ -88,7 +88,7 @@ export default function FerramentasPage() {
               grátis
               <DoodleUnderline className="absolute -bottom-1 left-0 w-full h-[10px] text-gray-500" />
             </span>{' '}
-            pra quem cria vídeo curto
+            pra quem cria vídeo
           </h1>
           <p className="max-w-[560px] text-[1rem] leading-relaxed text-[#333] mt-5">
             Do rascunho ao post: você escreve o roteiro, grava lendo o teleprompter

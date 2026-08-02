@@ -3,8 +3,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-import EmailGate from './EmailGate'
-import { hasStoredEmail } from './leadClient'
 import {
   countWords,
   hasContent,
@@ -65,11 +63,7 @@ export default function RoteiroReels() {
   const [ppm, setPpm] = useState(140)
   const [alvo, setAlvo] = useState(60)
   const [copied, setCopied] = useState(false)
-  const [gateAction, setGateAction] = useState<null | (() => void)>(null)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  // Ações principais pedem o e-mail uma única vez por navegador.
-  const gated = (fn: () => void) => () => (hasStoredEmail() ? fn() : setGateAction(() => fn))
 
   useEffect(() => {
     setList(loadRoteiros())
@@ -190,24 +184,12 @@ export default function RoteiroReels() {
 
       {/* ações */}
       <div className="flex flex-wrap gap-3 mt-8">
-        <Btn onClick={gated(copiar)}>{copied ? 'copiado' : 'copiar roteiro'}</Btn>
+        <Btn onClick={copiar}>{copied ? 'copiado' : 'copiar roteiro'}</Btn>
         {cur.id && hasContent(cur) && (
-          <Btn onClick={gated(abrirTeleprompter)}>abrir no teleprompter</Btn>
+          <Btn onClick={abrirTeleprompter}>abrir no teleprompter</Btn>
         )}
         <Btn onClick={() => setCur(fresh())}>novo roteiro</Btn>
       </div>
-
-      {gateAction && (
-        <EmailGate
-          source="roteiro-reels"
-          onDone={() => {
-            const fn = gateAction
-            setGateAction(null)
-            fn()
-          }}
-          onClose={() => setGateAction(null)}
-        />
-      )}
 
       {/* salvos */}
       {list.length > 0 && (

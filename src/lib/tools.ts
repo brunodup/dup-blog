@@ -12,10 +12,10 @@ export type Tool = {
 export const TOOLS: Tool[] = [
   {
     slug: 'roteiro-reels',
-    name: 'roteiro pra reels',
-    title: 'organizador de roteiro pra reels e tiktok',
+    name: 'roteiro pra vídeo curto',
+    title: 'organizador de roteiro pra vídeo curto',
     description:
-      'Escreva roteiros de vídeo curto com estrutura de hook, desenvolvimento e CTA — com estimativa de duração falada em tempo real. Grátis, direto no navegador.',
+      'Escreva roteiros de reels, tiktok e shorts com estrutura de hook, desenvolvimento e CTA — e estimativa de duração falada em tempo real. Grátis, direto no navegador.',
     status: 'live',
   },
   {

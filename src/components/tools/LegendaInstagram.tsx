@@ -2,9 +2,6 @@
 
 import { useMemo, useState } from 'react'
 
-import EmailGate from './EmailGate'
-import { hasStoredEmail } from './leadClient'
-
 const REDES = [
   { key: 'instagram', label: 'instagram', max: 2200, cut: 125 },
   { key: 'tiktok', label: 'tiktok', max: 2200, cut: null },
@@ -51,7 +48,6 @@ export default function LegendaInstagram() {
   const [text, setText] = useState('')
   const [rede, setRede] = useState<RedeKey>('instagram')
   const [copied, setCopied] = useState(false)
-  const [gateOpen, setGateOpen] = useState(false)
 
   const conf = REDES.find((r) => r.key === rede)!
   const formatted = useMemo(() => formatCaption(text), [text])
@@ -70,11 +66,6 @@ export default function LegendaInstagram() {
     }
   }
 
-  const onCopy = () => {
-    if (!formatted) return
-    if (hasStoredEmail()) copiar()
-    else setGateOpen(true)
-  }
 
   return (
     <div className="max-w-[680px]">
@@ -135,7 +126,7 @@ export default function LegendaInstagram() {
       <div className="flex flex-wrap items-center gap-3 mt-6">
         <button
           type="button"
-          onClick={onCopy}
+          onClick={copiar}
           disabled={!formatted}
           className="border border-black rounded-md px-5 py-2.5 text-xs uppercase tracking-widest text-black hover:bg-black hover:text-white transition-colors duration-150 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-black"
         >
@@ -145,17 +136,6 @@ export default function LegendaInstagram() {
           cola direto no app — as quebras ficam
         </span>
       </div>
-
-      {gateOpen && (
-        <EmailGate
-          source="legenda-instagram"
-          onDone={() => {
-            setGateOpen(false)
-            copiar()
-          }}
-          onClose={() => setGateOpen(false)}
-        />
-      )}
     </div>
   )
 }

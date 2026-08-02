@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import LogoLink from '@/components/LogoLink'
+import ToolGate from '@/components/tools/ToolGate'
 import { SITE_URL } from '@/lib/seo'
 import { TOOLS, type Tool } from '@/lib/tools'
 
@@ -90,7 +91,7 @@ export default function ToolShell({
           <p className="text-[1rem] leading-relaxed text-[#333]">{intro}</p>
         </header>
 
-        {children}
+        <ToolGate source={tool.slug}>{children}</ToolGate>
 
         {faq.length > 0 && (
           <section className="max-w-[680px] mt-16 pt-10 border-t border-gray-100">

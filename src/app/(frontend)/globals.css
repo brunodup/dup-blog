@@ -89,15 +89,6 @@
   box-shadow: 0 0 10px #38bdf8, 0 0 5px #38bdf8 !important;
 }
 
-/* ── Sketch (landing de ferramentas) ────────────────────────────────────────── */
-/* Papel quadriculado sutil — linhas-guia de rascunho. */
-.sketch-grid {
-  background-image:
-    linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
-  background-size: 28px 28px;
-}
-
 /* ── Animations ─────────────────────────────────────────────────────────────── */
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(40px); }
