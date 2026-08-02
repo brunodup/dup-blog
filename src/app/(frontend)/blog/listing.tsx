@@ -86,8 +86,14 @@ export async function BlogListing({ page }: { page: number }) {
       <LogoLink className="board-title text-black select-none" />
 
       <div className="w-[95%] mx-auto pt-2 pb-24 md:w-auto md:max-w-[90vw] md:px-6">
-        <nav className="mb-10">
+        <nav className="mb-10 flex items-center justify-between">
           <BackButton />
+          <Link
+            href="/ferramentas"
+            className="text-xs tracking-widest uppercase text-gray-400 hover:text-black transition-colors duration-150"
+          >
+            ferramentas →
+          </Link>
         </nav>
 
         <h1 className="font-switzer text-[1.75rem] font-semibold leading-tight tracking-tight text-black mb-2">

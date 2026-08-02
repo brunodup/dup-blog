@@ -4,6 +4,7 @@ import { getPayload } from 'payload'
 
 import config from '@payload-config'
 import { PUBLISHED, SITE_URL } from '@/lib/seo'
+import { liveTools } from '@/lib/tools'
 
 export const revalidate = 3600
 
@@ -41,6 +42,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.9,
     },
+    {
+      url: `${SITE_URL}/ferramentas`,
+      changeFrequency: 'weekly' as const,
+      priority: 0.9,
+    },
+    ...liveTools().map((t) => ({
+      url: `${SITE_URL}/ferramentas/${t.slug}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
     ...posts
       .filter((p) => p.slug)
       .map((p) => ({
