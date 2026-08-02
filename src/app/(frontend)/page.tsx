@@ -26,8 +26,8 @@ export default async function HomePage() {
     (item: any) => ({ label: item.label ?? '', href: item.href ?? '/', target: item.target ?? '_self' }) // eslint-disable-line @typescript-eslint/no-explicit-any
   )
 
-  const videoSrc = process.env.BACKGROUND_VIDEO_URL || '/dup-video-final-full.mp4'
-  const videoPoster = process.env.BACKGROUND_VIDEO_POSTER_URL || undefined
+  const videoSrc = process.env.BACKGROUND_VIDEO_URL || '/bg-home.mp4'
+  const videoPoster = process.env.BACKGROUND_VIDEO_POSTER_URL || '/bg-home-poster.jpg'
 
   return (
     <main className="w-screen h-screen overflow-hidden">

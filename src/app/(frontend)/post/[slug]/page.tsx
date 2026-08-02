@@ -6,6 +6,7 @@ import { getPayload } from 'payload'
 
 import config from '@payload-config'
 import type { Category, Media, Post } from '@/payload-types'
+import BlogIntro from '@/components/BlogIntro'
 import CodePlayground from '@/components/CodePlayground'
 import ImageWithModal from '@/components/ImageWithModal'
 import LogoLink from '@/components/LogoLink'
@@ -56,6 +57,7 @@ function BackButton() {
 function PostShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-white">
+      <BlogIntro />
       <LogoLink className="board-title text-black select-none" />
       <div className="w-[95%] mx-auto pt-2 pb-24 md:w-auto md:max-w-[90vw] md:px-6">
         <nav className="mb-14 flex items-center justify-between">

@@ -4,6 +4,7 @@ import Link from 'next/link'
 
 import LogoLink from '@/components/LogoLink'
 import EmailCaptureCard from '@/components/tools/EmailCaptureCard'
+import VideoBackdrop from '@/components/tools/VideoBackdrop'
 import {
   DoodleArrow,
   DoodleCircle,
@@ -69,7 +70,8 @@ const CARD_TILT = ['-rotate-1', 'rotate-1', '-rotate-[0.5deg]']
 
 export default function FerramentasPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <VideoBackdrop src="/bg-tools.mp4" poster="/bg-tools-poster.jpg">
+    <div className="min-h-screen">
       <LogoLink className="board-title text-black select-none" />
 
       <div className="w-[95%] mx-auto pt-2 pb-24 md:w-auto md:max-w-[90vw] md:px-6">
@@ -210,5 +212,6 @@ export default function FerramentasPage() {
         </section>
       </div>
     </div>
+    </VideoBackdrop>
   )
 }

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { getPayload } from 'payload'
 
 import config from '@payload-config'
+import BlogIntro from '@/components/BlogIntro'
 import LogoLink from '@/components/LogoLink'
 import PostCard from '@/components/PostCard'
 import { PUBLISHED } from '@/lib/seo'
@@ -83,6 +84,7 @@ export async function BlogListing({ page }: { page: number }) {
 
   return (
     <div className="min-h-screen bg-white">
+      <BlogIntro />
       <LogoLink className="board-title text-black select-none" />
 
       <div className="w-[95%] mx-auto pt-2 pb-24 md:w-auto md:max-w-[90vw] md:px-6">

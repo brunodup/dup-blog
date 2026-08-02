@@ -42,7 +42,7 @@ export default function ImageWithModal({ src, alt, width, height }: Props) {
         alt={alt}
         width={width}
         height={height}
-        className="w-full h-auto block cursor-zoom-in"
+        className="w-auto h-auto max-w-full max-h-[90vh] mx-auto block cursor-zoom-in"
         priority
         onClick={() => setOpen(true)}
       />

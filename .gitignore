@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+# Vídeos brutos pra compressão (processados via ffmpeg -> public/)
+/videos/
