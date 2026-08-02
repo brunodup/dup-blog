@@ -11,7 +11,7 @@ import { PUBLISHED } from '@/lib/seo'
 // Conteúdo à esquerda sobre o vídeo de fundo, sem painel — mesma estrutura
 // do hub /ferramentas: largura contida (70vw) e não centralizada, deixando
 // o vídeo visível à direita.
-const CONTENT = 'w-[95%] mx-auto mt-4 mb-16 p-6 bg-white/30 backdrop-blur-md rounded-[20px] md:w-auto md:max-w-[60vw] md:mx-0 md:ml-[5vw] md:mt-8 md:mb-24 md:p-[60px]'
+const CONTENT = 'w-[95%] mx-auto mt-4 mb-16 p-6 bg-white/30 backdrop-blur-md rounded-[20px] md:w-auto md:max-w-[60vw] md:mx-0 md:ml-5 md:mt-8 md:mb-24 md:p-[60px]'
 
 export const PER_PAGE = 24
 
