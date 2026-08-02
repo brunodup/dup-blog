@@ -79,8 +79,8 @@ export default function ToolShell({
 
   return (
     <VideoBackdrop
-      src="/bg-list.mp4"
-      poster="/bg-list-poster.jpg"
+      src="/bg-detail.mp4"
+      poster="/bg-detail-poster.jpg"
       pauseAt={4}
       persistent={<LogoLink className="board-title text-black select-none" />}
     >
