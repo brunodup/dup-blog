@@ -277,7 +277,7 @@ export default function DraggableBoard({ posts, videoSrc, videoPoster, menuItems
   // Pausa em 7s e dispara entrada dos cards em 4s.
   const handleTimeUpdate = useCallback((e: React.SyntheticEvent<HTMLVideoElement>) => {
     const video = e.currentTarget
-    if (!playingToEndRef.current && video.currentTime >= 5) {
+    if (!playingToEndRef.current && video.currentTime >= 5.3) {
       video.pause()
     }
     if (!entryFiredRef.current && video.currentTime >= 4) {
