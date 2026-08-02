@@ -150,6 +150,10 @@ export interface Post {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Meta description e texto de compartilhamento (~160 caracteres). Se vazio, o início do conteúdo é usado.
+   */
+  excerpt?: string | null;
   media?: (number | null) | Media;
   /**
    * Imagem de capa exibida no card do mural.
@@ -159,6 +163,7 @@ export interface Post {
   html?: string | null;
   css?: string | null;
   js?: string | null;
+  publishedAt?: string | null;
   categories?: (number | Category)[] | null;
   /**
    * Posição horizontal no mural (0–100%).
@@ -174,6 +179,7 @@ export interface Post {
   slug?: string | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -374,18 +380,21 @@ export interface PostsSelect<T extends boolean = true> {
   type?: T;
   title?: T;
   body?: T;
+  excerpt?: T;
   media?: T;
   thumbnail?: T;
   jsMode?: T;
   html?: T;
   css?: T;
   js?: T;
+  publishedAt?: T;
   categories?: T;
   position_x?: T;
   position_y?: T;
   slug?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

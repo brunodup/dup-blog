@@ -1,4 +1,10 @@
-import type { CollectionBeforeValidateHook, CollectionConfig } from 'payload'
+import { revalidatePath } from 'next/cache'
+import type {
+  CollectionAfterChangeHook,
+  CollectionAfterDeleteHook,
+  CollectionBeforeValidateHook,
+  CollectionConfig,
+} from 'payload'
 
 const DIACRITICS = new RegExp('[\\u0300-\\u036f]', 'g')
 
@@ -53,6 +59,32 @@ const ensureSlug: CollectionBeforeValidateHook = async ({ data, operation, origi
   return data
 }
 
+// ISR on-demand: publicou/editou/apagou → páginas afetadas atualizam na hora,
+// sem esperar a janela de revalidate.
+const revalidatePost = (slug?: string | null) => {
+  try {
+    revalidatePath('/')
+    if (slug) revalidatePath(`/post/${slug}`)
+    revalidatePath('/blog')
+    revalidatePath('/blog/pagina/[num]', 'page')
+    revalidatePath('/categoria/[slug]', 'page')
+    revalidatePath('/sitemap.xml')
+    revalidatePath('/feed.xml')
+  } catch {
+    // Fora do request scope do Next (CLI/scripts) o revalidate não existe — ignora.
+  }
+}
+
+const revalidateAfterChange: CollectionAfterChangeHook = ({ doc, previousDoc }) => {
+  revalidatePost(doc?.slug)
+  if (previousDoc?.slug && previousDoc.slug !== doc?.slug) revalidatePost(previousDoc.slug)
+  return doc
+}
+
+const revalidateAfterDelete: CollectionAfterDeleteHook = ({ doc }) => {
+  revalidatePost(doc?.slug)
+}
+
 const randomPercent = (): number => Math.round((12 + Math.random() * 76) * 100) / 100
 
 const isSnippet = (data: Record<string, unknown>) => data?.type === 'snippet'
@@ -61,17 +93,24 @@ const notSnippet = (data: Record<string, unknown>) => data?.type !== 'snippet'
 export const Posts: CollectionConfig = {
   slug: 'posts',
   access: {
-    read: () => true,
+    // Público só enxerga post publicado; logado vê tudo (inclusive rascunho).
+    read: ({ req }) => (req.user ? true : { _status: { equals: 'published' } }),
     create: ({ req }) => Boolean(req.user),
     update: ({ req }) => Boolean(req.user),
     delete: ({ req }) => Boolean(req.user),
   },
+  versions: {
+    drafts: true,
+    maxPerDoc: 20,
+  },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'type', 'slug', 'updatedAt'],
+    defaultColumns: ['title', 'type', 'slug', '_status', 'updatedAt'],
   },
   hooks: {
     beforeValidate: [ensureSlug],
+    afterChange: [revalidateAfterChange],
+    afterDelete: [revalidateAfterDelete],
   },
   fields: [
     {
@@ -98,6 +137,16 @@ export const Posts: CollectionConfig = {
       name: 'body',
       type: 'richText',
       label: 'Conteúdo / descrição',
+    },
+    {
+      name: 'excerpt',
+      type: 'textarea',
+      label: 'Resumo (SEO)',
+      maxLength: 200,
+      admin: {
+        description:
+          'Meta description e texto de compartilhamento (~160 caracteres). Se vazio, o início do conteúdo é usado.',
+      },
     },
     {
       name: 'media',
@@ -158,6 +207,17 @@ export const Posts: CollectionConfig = {
         components: {
           Field: '@/components/admin/CodeSnippetPlayground',
         },
+      },
+    },
+    // ── Publicação (sidebar, all types) ────────────────────────────────────
+    {
+      name: 'publishedAt',
+      type: 'date',
+      label: 'Publicado em',
+      defaultValue: () => new Date().toISOString(),
+      admin: {
+        position: 'sidebar',
+        date: { pickerAppearance: 'dayAndTime' },
       },
     },
     // ── Categories (sidebar, all types) ───────────────────────────────────

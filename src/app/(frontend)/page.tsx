@@ -12,6 +12,7 @@ export default async function HomePage() {
   const [{ docs: posts }, menuGlobal] = await Promise.all([
     payload.find({
       collection: 'posts',
+      where: { _status: { equals: 'published' } },
       depth: 1,
       limit: 100,
       sort: 'createdAt',
