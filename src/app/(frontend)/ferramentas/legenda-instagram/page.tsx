@@ -21,6 +21,10 @@ export const metadata: Metadata = {
 
 const FAQ: Faq[] = [
   {
+    q: 'O que faz uma boa legenda de Instagram?',
+    a: 'Seis coisas que dá pra checar sem achismo: um gancho que caiba nos ~125 caracteres antes do "…mais"; texto que respira em blocos curtos em vez de parede; uma chamada pra ação (comenta, salva, compartilha); uma pergunta, que é o jeito mais direto de puxar comentário; hashtags poucas, específicas e no fim; e caber no limite da rede. A ferramenta avalia esses seis critérios em tempo real enquanto você escreve.',
+  },
+  {
     q: 'Por que o Instagram come as quebras de linha da legenda?',
     a: 'Quando uma linha termina com espaço, o Instagram descarta a quebra seguinte — e linhas totalmente vazias às vezes são colapsadas. A formatação daqui limpa os espaços no fim de cada linha e preenche as linhas vazias com um caractere invisível, então o texto cola no app exatamente como você escreveu.',
   },
@@ -42,7 +46,7 @@ export default function LegendaInstagramPage() {
   return (
     <ToolShell
       tool={tool}
-      intro="Escreva a legenda com as quebras de linha do jeito que você quer — a ferramenta formata pro Instagram não engolir nenhuma, conta os caracteres no limite da rede e mostra exatamente o que aparece antes do corte do “…mais”. Copia e cola pronto."
+      intro="Escreva a legenda e veja, em tempo real, se a estrutura tá boa: gancho antes do corte, texto que respira, chamada pra ação, pergunta e hashtags na medida. A ferramenta ainda formata as quebras de linha pro Instagram não engolir nenhuma e mostra exatamente o que aparece antes do “…mais”."
       faq={FAQ}
     >
       <LegendaInstagram />

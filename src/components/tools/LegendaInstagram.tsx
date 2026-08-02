@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react'
 
+import { evaluateCaption, scoreOf, type RuleResult } from './captionRules'
+
 const REDES = [
   { key: 'instagram', label: 'instagram', max: 2200, cut: 125 },
   { key: 'tiktok', label: 'tiktok', max: 2200, cut: null },
@@ -30,6 +32,48 @@ function formatCaption(text: string): string {
 
 const countHashtags = (text: string): number => (text.match(/#[^\s#]+/g) ?? []).length
 
+const RULE_MARK: Record<RuleResult['status'], { mark: string; cls: string }> = {
+  ok: { mark: '✓', cls: 'text-black' },
+  warn: { mark: '!', cls: 'text-black font-medium' },
+  tip: { mark: '·', cls: 'text-gray-400' },
+  idle: { mark: '○', cls: 'text-gray-300' },
+}
+
+function Checklist({ results }: { results: RuleResult[] }) {
+  const { ok, total } = scoreOf(results)
+  const idle = results.every((r) => r.status === 'idle')
+  return (
+    <div className="mt-6 border border-gray-100 rounded-md p-4">
+      <div className="flex items-baseline justify-between mb-3">
+        <h2 className="text-[11px] font-mono uppercase tracking-widest text-gray-400">
+          estrutura da legenda
+        </h2>
+        {!idle && (
+          <span className="text-[11px] font-mono uppercase tracking-widest text-gray-400">
+            {ok}/{total}
+          </span>
+        )}
+      </div>
+      <ul className="space-y-2">
+        {results.map((r) => {
+          const m = RULE_MARK[r.status]
+          return (
+            <li key={r.key} className="flex gap-2.5 items-baseline">
+              <span className={`font-mono text-xs w-3 shrink-0 text-center ${m.cls}`}>{m.mark}</span>
+              <span className="text-sm leading-snug">
+                <span className={`font-mono text-[11px] uppercase tracking-widest mr-2 ${m.cls}`}>
+                  {r.label}
+                </span>
+                <span className={r.status === 'idle' ? 'text-gray-300' : 'text-[#555]'}>{r.msg}</span>
+              </span>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}
+
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
@@ -55,6 +99,10 @@ export default function LegendaInstagram() {
   const over = chars - conf.max
   const hashtags = countHashtags(text)
   const preview = conf.cut ? formatted.replace(/\n/g, ' ').slice(0, conf.cut) : null
+  const rules = useMemo(
+    () => evaluateCaption(text, { cut: conf.cut, max: conf.max, chars }),
+    [text, conf.cut, conf.max, chars],
+  )
 
   const copiar = async () => {
     try {
@@ -108,6 +156,9 @@ export default function LegendaInstagram() {
           </span>
         )}
       </div>
+
+      {/* critérios de boa legenda — regras fixas, avaliadas ao digitar */}
+      <Checklist results={rules} />
 
       {/* preview do corte */}
       {preview !== null && text.trim() && (

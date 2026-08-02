@@ -31,7 +31,7 @@ export const TOOLS: Tool[] = [
     name: 'legenda pra instagram',
     title: 'formatador de legenda pra instagram',
     description:
-      'Quebra de linha que o Instagram respeita, contador de caracteres por rede e preview do corte do "…mais". Escreve, formata e copia pronto pra colar.',
+      'Quebra de linha que o Instagram respeita, checagem da estrutura em tempo real — gancho, respiro, chamada, hashtags — e preview do corte do "…mais".',
     status: 'live',
   },
 ]
