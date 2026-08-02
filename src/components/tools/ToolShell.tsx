@@ -79,8 +79,8 @@ export default function ToolShell({
 
   return (
     <VideoBackdrop
-      src="/bg-tools.mp4"
-      poster="/bg-tools-poster.jpg"
+      src="/bg-list.mp4"
+      poster="/bg-list-poster.jpg"
       persistent={<LogoLink className="board-title text-black select-none" />}
     >
     <div className="min-h-screen">

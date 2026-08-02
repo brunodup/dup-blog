@@ -89,8 +89,8 @@ export async function BlogListing({ page }: { page: number }) {
 
   return (
     <VideoBackdrop
-      src="/bg-blog.mp4"
-      poster="/bg-blog-poster.jpg"
+      src="/bg-list.mp4"
+      poster="/bg-list-poster.jpg"
       pauseAt={2.5}
       persistent={<LogoLink className="board-title text-black select-none" />}
     >
