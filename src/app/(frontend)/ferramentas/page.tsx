@@ -18,15 +18,15 @@ import { TOOLS, getTool } from '@/lib/tools'
 const caveat = Caveat({ subsets: ['latin'], weight: ['500', '600'], display: 'swap' })
 
 export const metadata: Metadata = {
-  title: 'ferramentas grátis pra quem cria vídeo',
+  title: 'ferramentas grátis pra quem cria',
   description:
-    'Roteiro, teleprompter e legenda — do rascunho ao post, grátis e direto no navegador. Em troca, só teu e-mail, uma vez.',
+    'Bancada de criação: roteiro, teleprompter e legenda já no ar — análise de vídeo, storytelling e design tokens no rascunho. Grátis, direto no navegador.',
   alternates: { canonical: '/ferramentas' },
   openGraph: {
     type: 'website',
     url: `${SITE_URL}/ferramentas`,
     title: 'ferramentas — brunodup',
-    description: 'Do rascunho ao post, grátis e direto no navegador.',
+    description: 'Bancada de criação — audiovisual, texto, multimídia. Grátis, direto no navegador.',
   },
 }
 
@@ -88,23 +88,23 @@ export default function FerramentasPage() {
               grátis
               <DoodleUnderline className="absolute -bottom-1 left-0 w-full h-[10px] text-gray-500" />
             </span>{' '}
-            pra quem cria vídeo
+            pra quem cria
           </h1>
           <p className="max-w-[560px] text-[1rem] leading-relaxed text-[#333] mt-5">
-            Do rascunho ao post: você escreve o roteiro, grava lendo o teleprompter
-            e sai com a legenda formatada. Tudo no navegador — nada é instalado,
-            nada do que você escreve sai da tua máquina.
+            Uma bancada de criação — audiovisual, texto, multimídia. Começou pelo
+            vídeo: roteiro, teleprompter e legenda. O resto tá no rascunho e vai
+            saindo. Tudo direto no navegador, nada instalado.
           </p>
           <div className="flex items-center gap-2 mt-6 text-gray-500">
-            <span className={`${caveat.className} text-xl -rotate-2`}>o fluxo inteiro, aqui embaixo</span>
+            <span className={`${caveat.className} text-xl -rotate-2`}>a trilha de vídeo, aqui embaixo</span>
             <DoodleArrow className="w-12 h-8 rotate-45" />
           </div>
         </header>
 
-        {/* ── o fluxo ──────────────────────────────────────────────────────── */}
+        {/* ── a trilha de vídeo ────────────────────────────────────────────── */}
         <section className="mb-16">
           <h2 className="text-[11px] font-mono uppercase tracking-widest text-gray-400 mb-8">
-            Como funciona
+            A trilha de vídeo
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 max-w-[900px]">
             {FLUXO.map((passo, i) => {
@@ -171,6 +171,30 @@ export default function FerramentasPage() {
               )
             })}
           </div>
+        </section>
+
+        {/* ── no rascunho ──────────────────────────────────────────────────── */}
+        <section className="mb-20 max-w-[900px]">
+          <h2 className="text-[11px] font-mono uppercase tracking-widest text-gray-400 mb-6">
+            No rascunho
+          </h2>
+          <ul className={`${caveat.className} text-xl md:text-2xl text-gray-500 space-y-2`}>
+            {[
+              'análise de vídeo — cortes, ritmo e hook, quadro a quadro',
+              'roteiro com IA — ela pergunta, você responde, sai roteiro',
+              'storytelling — pra vídeo e pra tom de voz de marca',
+              'legenda sincronizada com o áudio do vídeo',
+              'design tokens a partir das tuas imagens',
+            ].map((idea, i) => (
+              <li key={idea} className={`flex items-baseline gap-3 ${i % 2 ? 'rotate-[0.4deg]' : '-rotate-[0.4deg]'}`}>
+                <span className="font-mono text-[11px] text-gray-300 shrink-0">○</span>
+                {idea}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 text-[11px] font-mono uppercase tracking-widest text-gray-300">
+            sem data — vai saindo conforme fica pronto
+          </p>
         </section>
 
         {/* ── captação ─────────────────────────────────────────────────────── */}
