@@ -65,6 +65,8 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: postgresAdapter({
+    // Banco compartilhado com outros projetos — tudo deste site vive no schema `brunodup`.
+    schemaName: 'brunodup',
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
