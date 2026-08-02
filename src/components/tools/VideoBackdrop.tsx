@@ -106,7 +106,7 @@ export default function VideoBackdrop({ src, poster, pauseAt = 2.2, children }: 
           onEnded={handleEnded}
           onError={handleError}
         />
-        <div className="absolute inset-0 bg-white/85" />
+        <div className="absolute inset-0 bg-white/50" />
       </div>
       <div
         ref={contentRef}

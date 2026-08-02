@@ -160,12 +160,12 @@ export default function FerramentasPage() {
                   {tool.status === 'live' ? (
                     <Link
                       href={`/ferramentas/${tool.slug}`}
-                      className="block h-full border border-gray-200 rounded-md p-6 hover:border-black hover:rotate-0 transition-all duration-200"
+                      className="block h-full border border-gray-200 rounded-md p-6 bg-white/90 backdrop-blur-sm hover:border-black hover:bg-white hover:rotate-0 transition-all duration-200"
                     >
                       {inner}
                     </Link>
                   ) : (
-                    <div className="h-full border border-dashed border-gray-300 rounded-md p-6 opacity-60">
+                    <div className="h-full border border-dashed border-gray-300 rounded-md p-6 bg-white/70 backdrop-blur-sm opacity-60">
                       {inner}
                     </div>
                   )}

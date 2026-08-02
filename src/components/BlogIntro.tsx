@@ -61,7 +61,7 @@ export default function BlogIntro() {
         preload="auto"
         className="w-full h-full object-cover"
         onTimeUpdate={(e) => {
-          if (e.currentTarget.currentTime >= 4) dismiss()
+          if (e.currentTarget.currentTime >= 2.5) dismiss()
         }}
         onEnded={dismiss}
         onError={dismiss}
