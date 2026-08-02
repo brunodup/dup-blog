@@ -109,7 +109,7 @@ export default function VideoBackdrop({ src, poster, pauseAt = 2.2, persistent, 
           onError={handleError}
         />
       </div>
-      {persistent && <div className="relative z-20">{persistent}</div>}
+      {persistent && <div className="sticky top-0 z-30 bg-white">{persistent}</div>}
       <div
         ref={contentRef}
         className={`relative z-10 transition-opacity duration-500${exiting ? ' opacity-0' : ''}`}
