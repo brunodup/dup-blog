@@ -9,9 +9,9 @@ import { TOOLS, type Tool } from '@/lib/tools'
 export type Faq = { q: string; a: string }
 
 // Conteúdo à esquerda sobre o vídeo de fundo, sem painel — mesma estrutura
-// do hub /ferramentas: largura contida (70vw) e não centralizada, deixando
+// do hub /ferramentas: largura contida (50vw) e não centralizada, deixando
 // o vídeo visível à direita.
-const CONTENT = 'w-[95%] mx-auto mt-4 mb-16 p-6 bg-white/30 backdrop-blur-md rounded-[20px] md:w-auto md:max-w-[70vw] md:mx-0 md:ml-5 md:mt-8 md:mb-24 md:p-[60px]'
+const CONTENT = 'w-[95%] mx-auto mt-4 mb-16 p-6 bg-white/30 backdrop-blur-md rounded-[20px] md:w-auto md:max-w-[50vw] md:mx-0 md:ml-5 md:mt-8 md:mb-24 md:p-[60px]'
 
 function BackButton() {
   return (
@@ -67,12 +67,15 @@ export default function ToolShell({
   tool,
   intro,
   faq,
+  about,
   children,
 }: {
   tool: Tool
   /** Parágrafo de abertura — é o conteúdo que ranqueia, não a ferramenta. */
   intro: string
   faq: Faq[]
+  /** Conteúdo explicativo entre o intro e a ferramenta — fica fora do gate. */
+  about?: React.ReactNode
   children: React.ReactNode
 }) {
   const others = TOOLS.filter((t) => t.slug !== tool.slug && t.status === 'live')
@@ -101,6 +104,8 @@ export default function ToolShell({
           </h1>
           <p className="text-[1rem] leading-relaxed text-[#333]">{intro}</p>
         </header>
+
+        {about}
 
         <ToolGate source={tool.slug}>{children}</ToolGate>
 

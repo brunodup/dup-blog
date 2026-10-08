@@ -34,6 +34,14 @@ export const TOOLS: Tool[] = [
       'Quebra de linha que o Instagram respeita, checagem da estrutura em tempo real — gancho, respiro, chamada, hashtags — e preview do corte do "…mais".',
     status: 'live',
   },
+  {
+    slug: 'dup-languages',
+    name: 'dup.languages',
+    title: 'aprender idioma conversando com o Claude',
+    description:
+      'Gerador de prompt pra transformar o Claude num parceiro de conversa diário: corrige, ensina vocabulário e acompanha teu nível no meio do papo.',
+    status: 'live',
+  },
 ]
 
 export const liveTools = () => TOOLS.filter((t) => t.status === 'live')
