@@ -59,8 +59,8 @@ const PASSOS: { t: string; p: React.ReactNode; nota?: string }[] = [
     p: 'Nas configurações do Claude, ativa a memória. Assim ele lembra do seu nível, dos erros que se repetem e do que vocês conversaram nos dias anteriores.',
   },
   {
-    t: 'Cria o gatilho do horário',
-    p: 'Coloca um lembrete no celular no horário que você escolheu. Na hora, abre o projeto, começa uma conversa e manda um "hola", "hi" ou o que for. A primeira sessão calibra seu nível sozinha.',
+    t: 'Começa a primeira conversa',
+    p: 'Abre uma conversa nova no projeto e manda um "oi". Na primeira vez, o Claude explica como funciona, combina o lembrete diário com você e já calibra seu nível conversando. Depois é só voltar no horário combinado.',
     nota: 'Dia corrido? Manda "versão curta" e faz 5 perguntas em 2 minutos. Progresso pequeno é progresso.',
   },
 ]

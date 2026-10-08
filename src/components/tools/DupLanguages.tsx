@@ -73,11 +73,14 @@ const clean = (s: string) => (s || '').trim().replace(/\s+\n/g, '\n')
 const cap = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s)
 const lc = (s: string) => (s ? s.charAt(0).toLowerCase() + s.slice(1) : s)
 
-function period(t: string): string {
-  if (!t) return 'no mesmo horário todo dia'
-  const h = parseInt(t.split(':')[0], 10)
-  const p = h < 12 ? 'de manhã' : h < 18 ? 'à tarde' : 'à noite'
-  return p + ', por volta das ' + t.replace(':', 'h')
+const PAREN_EXAMPLE: Record<Exclude<LangKey, 'other'>, string> = {
+  'es-es': 'Quiero (alugar) un coche',
+  'es-la': 'Quiero (alugar) un auto',
+  'en-us': 'I want to (alugar) a car',
+  'en-uk': 'I want to (alugar) a car',
+  fr: 'Je veux (alugar) une voiture',
+  it: 'Voglio (alugar) una macchina',
+  de: 'Ich möchte ein Auto (alugar)',
 }
 
 function buildPrompt(f: Form): string {
@@ -91,49 +94,67 @@ function buildPrompt(f: Form): string {
   const idioma = L.name.toLowerCase()
   const on = (k: RuleKey) => f.rules[k]
 
-  const goal = clean(f.goal)
-  const base = clean(f.base)
+  const goal = clean(f.goal).replace(/\.$/, '')
+  const base = clean(f.base).replace(/\.$/, '')
   const interests = clean(f.interests)
+  const dur = f.dur
+  const hora = f.time ? f.time.replace(':', 'h') : 'o horário que eu escolher'
   const extra = clean(f.extra)
     .split('\n')
     .map((s) => s.replace(/^[-•*]\s*/, '').trim())
     .filter(Boolean)
+  const parenEx = f.lang === 'other' ? 'uma frase com (alugar) no meio' : PAREN_EXAMPLE[f.lang]
 
-  const out: string[] = []
-  out.push('DUP.LANGUAGES · ' + L.label)
-  out.push('')
-  out.push('Objetivo')
-  let obj = 'Destravar meu ' + idioma + (goal ? ' pra: ' + lc(goal).replace(/\.$/, '') + '.' : '.')
-  if (L.variant) obj += ' ' + L.variant
-  if (base) obj += ' Base atual: ' + lc(base).replace(/\.$/, '') + '.'
-  obj += ' A primeira sessão serve pra calibrar meu nível real de escrita, leitura e conversa, sem anunciar que é teste.'
-  out.push(obj)
-  out.push('')
-  out.push('Formato')
-  out.push('- Bloco de ' + f.dur + ' por dia, ' + period(f.time) + '.')
-  if (on('mini')) out.push('- Dia cheio: versão mínima de ~5 perguntas / 2 min. Progresso pequeno é progresso.')
-  out.push(on('voice') ? '- Conversa por escrito (chat). Voz só quando eu quiser.' : '- Conversa por escrito ou por voz, como eu preferir no dia.')
-  if (on('short')) out.push('- Mensagens curtas, uma pergunta pequena por vez. Abertura longa afasta.')
-  if (on('invisible')) out.push('- Método invisível: nada de "hoje é aula de X". Puxa o papo como amigo, explicando ou perguntando algo.')
-  if (on('paren')) out.push('- Quando eu escrever uma palavra ou trecho em português entre parênteses no meio da frase, é dúvida: mostra como se diz aquilo em ' + idioma + ' e reescreve a minha frase inteira já corrigida antes de seguir o papo.')
-  if (on('immersion')) out.push('- A mensagem inteira fica em ' + idioma + ', inclusive o bloco de correção e a linha de fechamento. Português só quando eu pedir.')
-  if (on('grammar')) out.push('- Gramática depois do uso: explica o porquê só quando eu perguntar ou travar.')
-  if (on('examples')) out.push('- Toda correção vem com exemplo: frases curtas de contraste (forma certa x forma errada), não definição teórica.')
-  if (on('nogame')) out.push('- Sem gamificação, streak ou pontuação.')
-  extra.forEach((r) => out.push('- ' + r.replace(/\.?$/, '.')))
+  const o: string[] = []
+  const P = (s: string) => o.push(s)
 
+  P('DUP.LANGUAGES · ' + L.label)
+  P('')
+  P('QUEM VOCÊ É')
+  P('Você é meu parceiro de conversa em ' + idioma + '. Fala comigo como um amigo que vive no idioma: curioso, leve, puxando assunto sobre o que eu gosto. Seu trabalho é me fazer usar o ' + idioma + ' todo dia, por escrito, até a conversa sair natural. O método fica com você: corrige, ensina vocabulário e acompanha meu nível no fluxo do papo, como conversa entre amigos.')
+  P('')
+  P('MEU OBJETIVO')
+  P((goal ? cap(goal) + '.' : 'Ganhar fluidez pra conversar no dia a dia.') + (L.variant ? ' ' + L.variant : ''))
+  if (base) P('Onde estou hoje: ' + lc(base) + '.')
+  P('')
+  P('PRIMEIRA CONVERSA (só na primeira vez)')
+  P('1. Se apresenta em português, em 3 ou 4 frases curtas: a gente conversa em ' + idioma + ' todo dia, você corrige no caminho e no fim tem um resumo com o que eu errei e o porquê.' + (on('paren') ? ' Explica a regra dos parênteses com um exemplo.' : ''))
+  P('2. Combina o lembrete diário pras ' + hora + '. Se você conseguir criar tarefa agendada nesta conta, oferece criar um aviso diário nesse horário que já abre a sessão. Se não conseguir, me pede pra colocar agora um alarme no celular chamado "' + L.label.toLowerCase() + ' com Claude" e espera eu confirmar.')
+  P('3. Começa o papo em ' + idioma + ' e usa essa primeira sessão pra calibrar meu nível real de escrita, leitura e conversa, sem anunciar que é teste. No resumo, registra o nível que você percebeu.')
+  P('')
+  P('TODA SESSÃO')
+  P('- Antes de abrir, lê os resumos das sessões anteriores (conversas deste projeto e memória) pra retomar vocabulário, erros que se repetem e assuntos em aberto.')
+  P('- Abre com uma mensagem curta: um comentário ou pergunta sobre um dos meus assuntos.')
+  P('- Bloco de ' + dur + '.' + (on('mini') ? ' Se eu disser que o dia tá corrido, faz a versão mínima: umas 5 perguntas rápidas em 2 minutos. Progresso pequeno é progresso, e manter o hábito vale mais que a sessão longa.' : ''))
+  P('- Ajusta a dificuldade pelo que eu respondo: fluiu fácil, sobe um degrau; travei, simplifica e dá um exemplo.')
+  P('- Alterna os assuntos e traz palavras e expressões novas aos poucos, reaproveitando as dos dias anteriores.')
+  P('- Quando eu disser que acabou, ou o tempo passar, fecha com o resumo do dia.')
+  P('')
+  P('REGRAS DO PAPO (e por quê)')
+  if (on('invisible')) P('- Método invisível: nada de "hoje é aula de X". Puxa assunto e ensina no meio da conversa. Assim eu treino o que vou usar de verdade e o estudo fica leve.')
+  if (on('short')) P('- Mensagens curtas, uma pergunta pequena por vez. Textão cansa e me faz querer fechar o app.')
+  if (on('paren')) P('- Parênteses = dúvida. Quando eu escrever uma palavra ou trecho em português entre parênteses no meio da frase (ex: "' + parenEx + '"), mostra como se diz aquilo em ' + idioma + ' e reescreve a minha frase inteira já corrigida antes de seguir o papo. É meu jeito de não travar a conversa por falta de uma palavra.')
+  if (on('immersion')) P('- A mensagem inteira fica em ' + idioma + ', inclusive a correção e a linha de fechamento. Português só quando eu pedir ou na explicação da primeira conversa. Qualquer trecho em português no meio quebra a imersão.')
+  if (on('grammar')) P('- Gramática depois do uso: explica a regra só quando eu perguntar ou errar a mesma coisa de novo. Eu aprendo melhor usando primeiro.')
+  if (on('examples')) P('- Toda correção vem com exemplo curto de contraste (forma certa x forma que eu usei). Só a definição da regra não me mostra onde errei.')
+  if (on('nogame')) P('- Sem gamificação, streak ou pontuação. A motivação é a conversa boa.')
+  P(on('voice') ? '- Conversa por escrito. Voz só quando eu pedir: por escrito eu tenho tempo de montar a frase e ganho confiança.' : '- Conversa por escrito ou por voz, como eu preferir no dia.')
+  extra.forEach((r) => P('- ' + r.replace(/\.?$/, '.')))
+  P('')
   if (on('summary')) {
-    out.push('')
-    out.push('Resumo do dia')
-    out.push('Ao final, resumo curto: primeiro em ' + idioma + ', depois o mesmo em português. Erros detalhados um a um, com a forma certa e o porquê.')
+    P('RESUMO DO DIA')
+    P('No fim, um resumo curto: primeiro em ' + idioma + ', depois o mesmo em português. Inclui:')
+    P('- Assunto da conversa e vocabulário novo.')
+    P('- Cada erro, um por um: o que eu escrevi, a forma certa e o porquê, com exemplo.')
+    P('- Um ponto pra treinar amanhã.')
+    P('Se a memória estiver disponível, registra também meu nível atual e os erros que se repetem, pra próxima sessão começar de onde parou.')
+    P('')
   }
-
   if (interests) {
-    out.push('')
-    out.push('Assuntos (por vontade)')
-    out.push(interests)
+    P('ASSUNTOS (por vontade)')
+    P(interests)
   }
-  return out.join('\n')
+  return o.join('\n').trim()
 }
 
 const LABEL = 'block text-[11px] font-mono uppercase tracking-widest text-gray-400 mb-1.5'
